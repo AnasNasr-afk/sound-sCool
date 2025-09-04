@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sounds_cool/core/theming/color_manager.dart';
 
 import 'features/home/home_screen.dart';
 
@@ -12,10 +14,14 @@ class SoundsCoolApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sounds Cool',
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      child: MaterialApp(
+        title: 'Sounds Cool',
+        debugShowCheckedModeBanner: false,
+        home: const HomeScreen(),
+      ),
     );
   }
 }
