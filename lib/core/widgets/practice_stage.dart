@@ -1,1 +1,0 @@
-enum PracticeStage { generate, recording, feedback }

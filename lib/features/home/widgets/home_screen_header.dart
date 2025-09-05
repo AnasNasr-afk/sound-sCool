@@ -1,55 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sounds_cool/core/theming/color_manager.dart';
+import 'package:sounds_cool/core/theming/text_styles.dart';
 
 class HomeScreenHeader extends StatelessWidget {
   const HomeScreenHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hi Anas 👋',
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.w600,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w,),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text('Hi Anas', style: TextStyles.font22BlackBold),
+          SizedBox(width: 10.w),
+          Image.asset(
+            'assets/images/saluteIcon.png',
+            fit: BoxFit.cover,
+            width: 24.w,
+            height: 24.h,
+            color: ColorManager.darkGrey,
+          ),
+          Spacer(),
+          GestureDetector(
+            onTap: () {},
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorManager.darkGrey.withValues(alpha: 0.3),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Image.asset(
+                'assets/images/settingsIcon.png',
+                fit: BoxFit.cover,
+                width: 24.w,
+                height: 24.h,
                 color: ColorManager.mainBlack,
               ),
             ),
-            SizedBox(height: 4.h),
-            Row(
-              children: [
-                Icon(Icons.mic, color: Colors.green[600], size: 14.w),
-                const SizedBox(width: 4),
-                Text(
-                  '7 free records left',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.green[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.more_vert, color: Colors.grey[600], size: 20),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
