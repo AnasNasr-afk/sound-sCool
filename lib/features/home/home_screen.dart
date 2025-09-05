@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sounds_cool/core/theming/color_manager.dart';
 import 'package:sounds_cool/features/home/widgets/home_screen_header.dart';
-import 'package:sounds_cool/features/home/widgets/language_selection.dart';
+import 'package:sounds_cool/features/home/widgets/select_language.dart';
 import 'package:sounds_cool/features/home/widgets/learning_progress.dart';
-import 'package:sounds_cool/features/home/widgets/practice_area.dart';
+import 'package:sounds_cool/features/home/widgets/recent_session.dart';
+
+import '../../core/theming/text_styles.dart';
 
 
 
@@ -21,10 +23,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorManager.backgroundColor,
+      backgroundColor: ColorManager.backgroundColor2,
+
+
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          padding: EdgeInsets.symmetric( vertical: 5.h),
           child: Column(
             children: [
               // Layer 1: Header
@@ -34,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
               LearningProgress(),
               SizedBox(height: 20.h),
               //layer 3
-              LanguageSelection(),
+              SelectLanguage(),
               SizedBox(height: 20.h),
 
               //layer 4
-              Expanded(child:PracticeArea()),
+              RecentSession(),
 
               // // Layer 2: Learning Progress
               // LearningProgress(),
