@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sounds_cool/core/theming/color_manager.dart';
-import 'package:sounds_cool/core/theming/text_styles.dart';
+
+import '../../helpers/color_manager.dart';
+import '../../helpers/text_styles.dart';
+
 
 class HomeScreenHeader extends StatelessWidget {
   const HomeScreenHeader({super.key});

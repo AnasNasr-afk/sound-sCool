@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sounds_cool/core/theming/color_manager.dart';
+import 'package:sounds_cool/routing/app_router.dart';
 
-import 'features/home/home_screen.dart';
 
-void main() {
-  runApp(const SoundsCoolApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(SoundsCoolApp(appRouter: AppRouter()));
 }
 
 
 class SoundsCoolApp extends StatelessWidget {
-  const SoundsCoolApp({super.key});
+  final AppRouter appRouter;
+  const SoundsCoolApp({super.key, required this.appRouter});
 
   @override
   Widget build(BuildContext context) {
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
       child: MaterialApp(
         title: 'Sounds Cool',
         debugShowCheckedModeBanner: false,
-        home: const HomeScreen(),
+       onGenerateRoute: appRouter.onGenerateRoute,
       ),
     );
   }
