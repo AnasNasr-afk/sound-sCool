@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sounds_cool/business_logic/homeCubit/home_cubit.dart';
 import 'package:sounds_cool/business_logic/homeCubit/home_states.dart';
 
-import '../../helpers/color_manager.dart';
-import '../../helpers/text_styles.dart';
+import '../../../helpers/color_manager.dart';
+import '../../../helpers/text_styles.dart';
 import 'language_item.dart';
 import 'level_item.dart';
 

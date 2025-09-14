@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../business_logic/homeCubit/home_cubit.dart';
-import '../../../helpers/color_manager.dart';
-import '../../../helpers/text_styles.dart';
+import '../../../../business_logic/homeCubit/home_cubit.dart';
+import '../../../../helpers/color_manager.dart';
+import '../../../../helpers/text_styles.dart';
+
 
 class RecordingView extends StatelessWidget {
   final HomeCubit cubit;

@@ -10,6 +10,18 @@ class TextStyles {
     color: ColorManager.mainBlack,
     fontWeight: FontWeight.bold,
   );
+  static TextStyle font16LightBlackSemiBold = GoogleFonts.ibmPlexSansJp(
+    fontSize: 16.sp,
+      color: Colors.grey[800],
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.3
+  );
+
+  static TextStyle font18BlackBold = GoogleFonts.ibmPlexSansJp(
+    fontSize: 18.sp,
+    color: ColorManager.mainBlack,
+    fontWeight: FontWeight.bold,
+  );
   static TextStyle font14GreyRegular = GoogleFonts.ibmPlexSansJp(
     fontSize: 14.sp,
     color: ColorManager.darkGrey,

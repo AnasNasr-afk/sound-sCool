@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../helpers/color_manager.dart';
+import '../../../helpers/color_manager.dart';
 
 enum ActionState { idle, mic, recording }
 

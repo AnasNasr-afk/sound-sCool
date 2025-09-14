@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../helpers/color_manager.dart';
-import '../../helpers/text_styles.dart';
+import '../../../helpers/color_manager.dart';
+import '../../../helpers/text_styles.dart';
 
 
-class LevelItem extends StatelessWidget {
+class LanguageItem extends StatelessWidget {
   final String text;
+  final String assetPath;
   final bool isSelected;
   final VoidCallback? onTap;
 
-  const LevelItem({
+  const LanguageItem({
     super.key,
     required this.text,
+    required this.assetPath,
     this.isSelected = false,
     this.onTap,
   });
@@ -22,10 +24,10 @@ class LevelItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40.w,
-        height: 30.h,
+        width: 60.w,
+        height: 60.h,
         decoration: BoxDecoration(
-          color: isSelected ? ColorManager.mainGreen : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
@@ -35,17 +37,15 @@ class LevelItem extends StatelessWidget {
             ),
           ],
           border: isSelected
-              ? Border.all(color: Colors.white, width: 1.5.w)
+              ? Border.all(color: ColorManager.mainGreen, width: 1.5.w)
               : null,
         ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyles.font10BlackSemiBold.copyWith(
-              fontSize: 12.sp,
-              color: isSelected ? Colors.white : Colors.black,
-            ),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Image.asset(assetPath, width: 28.w, height: 28.h),
+            Text(text, style: TextStyles.font10BlackSemiBold),
+          ],
         ),
       ),
     );

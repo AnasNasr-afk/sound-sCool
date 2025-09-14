@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../helpers/color_manager.dart';
-import '../widgets/debug_info_widget.dart';
-import '../widgets/debug_stop_button.dart';
-import '../widgets/home_floating_action_button.dart';
-import '../widgets/home_screen_header.dart';
-import '../widgets/learning_progress.dart';
-import '../widgets/recentSession/recent_session.dart';
-import '../widgets/select_language.dart';
+
+import '../widgets/homeWidgets/home_floating_action_button.dart';
+import '../widgets/homeWidgets/home_screen_header.dart';
+import '../widgets/homeWidgets/learning_progress.dart';
+import '../widgets/homeWidgets/recentSessionWidgets/recent_session.dart';
+import '../widgets/homeWidgets/select_language.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

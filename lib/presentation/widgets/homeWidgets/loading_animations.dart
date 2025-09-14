@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../helpers/color_manager.dart';
-import '../../helpers/text_styles.dart';
+import '../../../helpers/color_manager.dart';
+import '../../../helpers/text_styles.dart';
 
 Widget buildLoadingAnimation() {
   return Center(

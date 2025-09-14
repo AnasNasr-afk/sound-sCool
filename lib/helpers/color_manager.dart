@@ -7,23 +7,14 @@ class ColorManager {
   static Color backgroundColor2 = const Color(0xFFFBFFFB).withValues(alpha: 0.95);
   static Color mainGreen = const Color(0xFF058E6E);
   static Color mainBlack = const Color(0xFF1E1E1E);
+  static Color whiter = const Color(0xFFEBFFF8);
 
 
-  // /// Teal Blue – fresh, modern, and techy.
-  // /// Can be used for secondary highlights or icons.
-  // static Color darkGreen = const Color(0xFF00897B);
-
-  /// Primary brand color – used for main buttons, active states, and key accents.
-  static Color primaryColor = const Color(0xFF00796B);
-
-  /// Accent color – contrasting warm tone, great for CTAs, highlights, or warnings.
-  static Color accentColor = const Color(0xFFFFB347);
 
   /// Light neutral grey – for dividers, borders, or subtle backgrounds.
   static Color mainGrey = const Color(0xFFE0E0E0);
 
-  // /// Strong black – main text color for maximum readability.
-  // static Color mainBlack2 = const Color(0xFF1C1C1E);
+
 
   /// Medium grey – for secondary text, placeholders, or less prominent UI elements.
   static Color darkGrey = const Color(0xFF6D6D72);
@@ -38,6 +29,5 @@ class ColorManager {
   static Color mainRed = const Color(0xFFE53935);
   static Color isRecordingColor = const Color(0xFFE74C3C);
 
-  /// Info / link color (e.g. informational messages, links, highlights).
   static Color mainBlue = const Color(0xFF2196F3);
 }
