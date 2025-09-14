@@ -36,6 +36,7 @@ class ColorManager {
 
   /// Error / alert color (e.g. error messages, destructive actions).
   static Color mainRed = const Color(0xFFE53935);
+  static Color isRecordingColor = const Color(0xFFE74C3C);
 
   /// Info / link color (e.g. informational messages, links, highlights).
   static Color mainBlue = const Color(0xFF2196F3);

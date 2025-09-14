@@ -26,7 +26,6 @@ class LanguageItem extends StatelessWidget {
       child: Container(
         width: 60.w,
         height: 60.h,
-        padding: EdgeInsets.all(6.w),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
