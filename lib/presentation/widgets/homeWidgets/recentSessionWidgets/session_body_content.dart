@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sounds_cool/presentation/widgets/recentSession/recording_view.dart';
-import 'package:sounds_cool/presentation/widgets/recentSession/text_generating_error.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/recentSessionWidgets/recording_view.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/recentSessionWidgets/text_generating_error.dart';
 
-import '../../../business_logic/homeCubit/home_cubit.dart';
-import '../../../business_logic/homeCubit/home_states.dart';
-import '../../../helpers/color_manager.dart';
-import '../../../helpers/text_styles.dart';
+import '../../../../business_logic/homeCubit/home_cubit.dart';
+import '../../../../business_logic/homeCubit/home_states.dart';
+import '../../../../helpers/color_manager.dart';
+import '../../../../helpers/text_styles.dart';
 import '../highlighted_text.dart';
 import '../loading_animations.dart';
+
 
 
 class SessionBodyContent extends StatelessWidget {

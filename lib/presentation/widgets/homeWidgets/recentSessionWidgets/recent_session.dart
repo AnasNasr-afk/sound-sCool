@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sounds_cool/presentation/widgets/recentSession/session_body_content.dart';
-import 'package:sounds_cool/presentation/widgets/recentSession/session_header.dart';
-import '../../../helpers/color_manager.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/recentSessionWidgets/session_body_content.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/recentSessionWidgets/session_header.dart';
+
+import '../../../../helpers/color_manager.dart';
 
 
 class RecentSession extends StatelessWidget {

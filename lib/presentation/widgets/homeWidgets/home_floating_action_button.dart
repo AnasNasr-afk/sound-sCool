@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sounds_cool/presentation/widgets/session_action_button.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/session_action_button.dart';
 
-import '../../business_logic/homeCubit/home_cubit.dart';
-import '../../business_logic/homeCubit/home_states.dart';
-import '../../data/models/generate_text_request.dart';
+import '../../../business_logic/homeCubit/home_cubit.dart';
+import '../../../business_logic/homeCubit/home_states.dart';
+import '../../../data/models/generate_text_request.dart';
 
 class HomeFloatingActionButton extends StatelessWidget {
   const HomeFloatingActionButton({super.key});

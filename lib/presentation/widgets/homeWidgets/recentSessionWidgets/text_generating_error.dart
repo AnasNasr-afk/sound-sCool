@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../business_logic/homeCubit/home_cubit.dart';
-import '../../../business_logic/homeCubit/home_states.dart';
-import '../../../data/models/generate_text_request.dart';
-import '../../../helpers/color_manager.dart';
-import '../../../helpers/text_styles.dart';
+
+import '../../../../business_logic/homeCubit/home_cubit.dart';
+import '../../../../data/models/generate_text_request.dart';
+import '../../../../helpers/color_manager.dart';
+import '../../../../helpers/text_styles.dart';
+
 
 class TextGenerationErrorView extends StatelessWidget {
   final String error;

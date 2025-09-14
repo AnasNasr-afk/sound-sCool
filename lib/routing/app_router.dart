@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sounds_cool/business_logic/authCubit/auth_cubit.dart';
 import 'package:sounds_cool/data/networking/api_service.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
 import '../business_logic/homeCubit/home_cubit.dart';
+import '../presentation/screens/auth_screen.dart';
 import '../presentation/screens/home_screen.dart';
 
 
@@ -14,6 +16,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => BlocProvider(
             create: (context) => HomeCubit(ApiService()),
             child: HomeScreen()));
+        case Routes.authScreen:
+        return MaterialPageRoute(builder: (_) => BlocProvider(
+            create: (context) => AuthCubit(),
+            child: AuthScreen()));
 
       default:
         return MaterialPageRoute(

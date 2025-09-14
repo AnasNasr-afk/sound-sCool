@@ -1,3 +1,5 @@
 class Routes {
-  static const String homeScreen = '/';
+  static const String authScreen = '/';
+  static const String homeScreen = '/homeScreen';
+
 }
