@@ -12,7 +12,7 @@ class GenerateTextRequest {
   String toPrompt() {
     return """
 You are a helpful language tutor. Write a new, unique, and engaging text in $language, 
-around 70 words long, for a learner at CEFR level $level.
+around 20 words long, for a learner at CEFR level $level.
 
 • Do not repeat any text or sentences you have generated before.  
 • Always vary the topic (e.g., daily routine, shopping, hobbies, travel, family, food, school, work).  

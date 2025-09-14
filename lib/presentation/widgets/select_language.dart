@@ -196,7 +196,7 @@ class SelectLanguage extends StatelessWidget {
     return Container(
       width: isSmall ? 60.w : 170.w,
       height: 40.h,
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      padding: EdgeInsets.symmetric(horizontal: 9.w),
       decoration: BoxDecoration(
         color: ColorManager.mainGreen.withValues(alpha: 0.08),
         border: Border.all(

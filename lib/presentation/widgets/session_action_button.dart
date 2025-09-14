@@ -1,56 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sounds_cool/helpers/color_manager.dart';
+import '../../helpers/color_manager.dart';
+
+enum ActionState { idle, mic, recording }
 
 class SessionActionButton extends StatelessWidget {
-  final bool isRecordingAvailable;
+  final ActionState actionState;
   final VoidCallback onGenerate;
-  final VoidCallback onRecord;
+  final VoidCallback onMic;
+  final VoidCallback onStop;
 
   const SessionActionButton({
     super.key,
-    required this.isRecordingAvailable,
+    required this.actionState,
     required this.onGenerate,
-    required this.onRecord,
+    required this.onMic,
+    required this.onStop,
   });
 
   @override
   Widget build(BuildContext context) {
-    final icon = isRecordingAvailable
-        ? Icons.mic
-        : Icons.generating_tokens_rounded;
+    IconData icon;
+    Color backgroundColor;
+    VoidCallback onPressed;
 
-    return Center(
-      child: Container(
-        width: 55.w,
-        height: 55.w,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [
-              ColorManager.mainGreen,
-              ColorManager.mainGreen.withValues(alpha: 0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    switch (actionState) {
+      case ActionState.idle:
+        icon = Icons.generating_tokens_rounded;
+        backgroundColor = ColorManager.mainGreen;
+        onPressed = onGenerate;
+        break;
+
+      case ActionState.mic:
+        icon = Icons.mic;
+        backgroundColor = ColorManager.mainGreen;
+        onPressed = onMic;
+        break;
+
+      case ActionState.recording:
+        icon = Icons.stop;
+        backgroundColor = ColorManager.isRecordingColor;
+        onPressed = onStop;
+        break;
+    }
+
+    return Container(
+      width: 65.w,
+      height: 65.w,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: backgroundColor.withValues(alpha: 0.3),
+            blurRadius: 12.r,
+            offset: const Offset(0, 6),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: ColorManager.mainGreen.withValues(alpha: 0.3),
-              blurRadius: 12.r,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
+        ],
+        border: Border.all(
+          color: Colors.white,
+          width: 2,
         ),
-        child: IconButton(
-          onPressed: isRecordingAvailable ? onRecord : onGenerate,
-          icon: Icon(icon, size: 32.w, color: Colors.white),
-          splashRadius: 40.r,
-        ),
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 32.w, color: Colors.white),
+        splashRadius: 30.r,
       ),
     );
   }
