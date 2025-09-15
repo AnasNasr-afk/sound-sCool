@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870662297667",
+    "project_id": "sound-s-cool",
+    "storage_bucket": "sound-s-cool.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870662297667:android:d600c9426d30d98dc05cf6",
+        "android_client_info": {
+          "package_name": "com.example.sounds_cool"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC76zaak53CuaZVRoSl2FZzlygnhE3fmxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
