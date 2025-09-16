@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/user_model.dart';
+import '../../helpers/shared_pref_helper.dart';
 import 'auth_states.dart';
-
 
 class AuthCubit extends Cubit<AuthStates> {
   AuthCubit() : super(AuthInitialState());
@@ -22,15 +22,10 @@ class AuthCubit extends Cubit<AuthStates> {
   final signupEmailController = TextEditingController();
   final signupPasswordController = TextEditingController();
 
-
   final loginFormKey = GlobalKey<FormState>();
   final signupFormKey = GlobalKey<FormState>();
 
-
-
-
   Future<void> signupUser() async {
-
     if (!signupFormKey.currentState!.validate()) {
       debugPrint("Signup form validation failed");
       return;
@@ -38,11 +33,14 @@ class AuthCubit extends Cubit<AuthStates> {
     emit(SignupLoadingState());
 
     try {
-      debugPrint("🔹 Creating user with email: ${signupEmailController.text.trim()}");
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: signupEmailController.text.trim(),
-        password: signupPasswordController.text.trim(),
+      debugPrint(
+        "🔹 Creating user with email: ${signupEmailController.text.trim()}",
       );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: signupEmailController.text.trim(),
+            password: signupPasswordController.text.trim(),
+          );
 
       final user = userCredential.user!;
       debugPrint("🎉 User created with UID: ${user.uid}");
@@ -64,10 +62,8 @@ class AuthCubit extends Cubit<AuthStates> {
       debugPrint("🔹 Saving user to Firestore: ${newUser.toMap()}");
       await _firestore.collection("users").doc(user.uid).set(newUser.toMap());
 
-
       emit(SignupSuccessState());
       debugPrint("Emitted SignupSuccessState");
-
     } on FirebaseAuthException catch (e) {
       debugPrint("FirebaseAuthException: ${e.message}");
       emit(SignupErrorState(e.message ?? "An unknown error occurred"));
@@ -78,20 +74,30 @@ class AuthCubit extends Cubit<AuthStates> {
   }
 
   Future<void> loginUser(BuildContext context) async {
-
     if (!loginFormKey.currentState!.validate()) return;
+
     emit(LoginLoadingState());
+
     try {
-      await _auth.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
         email: loginEmailController.text.trim(),
         password: loginPasswordController.text.trim(),
       );
-      emit(LoginSuccessState());
+
+      final uid = credential.user?.uid;
+
+      if (uid != null) {
+        // 🔐 Store UID in local storage
+        await SharedPrefHelper.setData(
+          "uid",
+          uid,
+        );
+        emit(LoginSuccessState());
+      }
     } on FirebaseAuthException catch (e) {
       emit(LoginErrorState(e.message ?? "Login failed"));
     } catch (e) {
       emit(LoginErrorState("Something went wrong"));
     }
   }
-
 }
