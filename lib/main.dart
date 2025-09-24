@@ -45,6 +45,7 @@ class SoundsCoolApp extends StatelessWidget {
         title: 'Sounds Cool',
         debugShowCheckedModeBanner: false,
         initialRoute: isLoggedIn ? Routes.homeScreen : Routes.authScreen,
+          // initialRoute: Routes.settingsScreen,
         onGenerateRoute: appRouter.onGenerateRoute,
       ),
     );
