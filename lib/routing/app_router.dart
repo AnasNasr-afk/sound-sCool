@@ -7,19 +7,27 @@ import 'package:sounds_cool/routing/routes.dart';
 import '../business_logic/homeCubit/home_cubit.dart';
 import '../presentation/screens/auth_screen.dart';
 import '../presentation/screens/home_screen.dart';
-
+import '../presentation/screens/settings_screen.dart';
 
 class AppRouter {
   Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.homeScreen:
-        return MaterialPageRoute(builder: (_) => BlocProvider(
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
             create: (context) => HomeCubit(ApiService()),
-            child: HomeScreen()));
-        case Routes.authScreen:
-        return MaterialPageRoute(builder: (_) => BlocProvider(
+            child: HomeScreen(),
+          ),
+        );
+      case Routes.authScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
             create: (context) => AuthCubit(),
-            child: AuthScreen()));
+            child: AuthScreen(),
+          ),
+        );
+      case Routes.settingsScreen:
+        return MaterialPageRoute(builder: (_) => SettingsScreen());
 
       default:
         return MaterialPageRoute(

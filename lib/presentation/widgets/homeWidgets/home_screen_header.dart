@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../helpers/color_manager.dart';
 import '../../../helpers/text_styles.dart';
+import '../../../routing/routes.dart';
 
 
 class HomeScreenHeader extends StatelessWidget {
@@ -26,7 +27,9 @@ class HomeScreenHeader extends StatelessWidget {
           ),
           Spacer(),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, Routes.settingsScreen);
+            },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
               decoration: BoxDecoration(
