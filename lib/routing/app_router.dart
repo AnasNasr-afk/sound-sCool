@@ -29,6 +29,8 @@ class AppRouter {
       case Routes.settingsScreen:
         return MaterialPageRoute(builder: (_) => SettingsScreen());
 
+        
+        
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

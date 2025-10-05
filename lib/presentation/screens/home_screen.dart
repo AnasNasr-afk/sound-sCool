@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../helpers/color_manager.dart';
 
-import '../widgets/homeWidgets/home_floating_action_button.dart';
 import '../widgets/homeWidgets/home_screen_header.dart';
 import '../widgets/homeWidgets/learning_progress.dart';
-import '../widgets/homeWidgets/recentSessionWidgets/recent_session.dart';
+
 import '../widgets/homeWidgets/select_language.dart';
+import '../widgets/homeWidgets/textRecordAnalyzeWidet/textRecordAnalyzeParentWidget/text_record_analyze_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,11 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorManager.backgroundColor2,
-      floatingActionButton: const HomeFloatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: const HomeFloatingActionButton(),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 5.h),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Column(
             children: [
               // Layer 1: Header
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
               // Layer 4
-              RecentSession(),
+              TextRecordAnalyzeWidget(),
 
 
             ],

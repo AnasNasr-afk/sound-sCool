@@ -1,3 +1,5 @@
+import 'home_cubit.dart';
+
 abstract class HomeStates {}
 
 class HomeInitialState extends HomeStates {}
@@ -31,54 +33,33 @@ class SectionToggledState extends HomeStates {
   SectionToggledState(this.expandedSection);
 }
 
-// Audio Recording States
-class SpeechListeningState extends HomeStates {}
-
-class SpeechPartialResultState extends HomeStates {
-  final String partialText;
-  SpeechPartialResultState(this.partialText);
+// Recording States
+class RecordInProgressState extends HomeStates {
+  final String text;
+  RecordInProgressState(this.text);
 }
 
-
-
-
-class SpeechStoppedState extends HomeStates {
-  final String? audioFilePath;
-  SpeechStoppedState([this.audioFilePath]);
+class RecordSuccessState extends HomeStates {
+  final String text;
+  RecordSuccessState(this.text);
 }
 
-class SpeechCancelledState extends HomeStates {}
-
-class SpeechErrorState extends HomeStates {
+class RecordErrorState extends HomeStates {
   final String error;
-  SpeechErrorState(this.error);
+  RecordErrorState(this.error);
 }
 
-// Recording Timer State
 class SpeechTimerTickState extends HomeStates {
-  final String formattedTime;
-  SpeechTimerTickState(this.formattedTime);
+  final int seconds;
+  SpeechTimerTickState(this.seconds);
 }
 
-// Pronunciation Analysis States (for future use)
-class PronunciationAnalysisLoadingState extends HomeStates {}
-
-class PronunciationResultState extends HomeStates {
-  final String recognizedText;
-  final List<bool> wordAnalysis; // true = correct, false = incorrect
-  final double accuracy;
-  final Map<int, bool> wordResults; // index -> correct/incorrect
-
-  PronunciationResultState({
-    required this.recognizedText,
-    required this.wordAnalysis,
-    required this.accuracy,
-    required this.wordResults,
-  });
+class StageChangedState extends HomeStates {
+  final Stage stage;
+  StageChangedState(this.stage);
 }
 
-
-class PronunciationAnalysisErrorState extends HomeStates {
-  final String error;
-  PronunciationAnalysisErrorState(this.error);
+class SoundLevelChangedState extends HomeStates {
+  final double level;
+  SoundLevelChangedState(this.level);
 }
