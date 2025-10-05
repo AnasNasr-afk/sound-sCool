@@ -45,8 +45,14 @@ class SoundsCoolApp extends StatelessWidget {
         title: 'Sounds Cool',
         debugShowCheckedModeBanner: false,
         initialRoute: isLoggedIn ? Routes.homeScreen : Routes.authScreen,
-          // initialRoute: Routes.settingsScreen,
+          // initialRoute: Routes.authScreen,
         onGenerateRoute: appRouter.onGenerateRoute,
+        //status bar color
+    //     theme: ThemeData(
+    //       appBarTheme: const AppBarTheme(backgroundColor: Colors.white, foregroundColor: Colors.black,
+    // elevation: 0
+    //       ),
+    //     ),
       ),
     );
   }
