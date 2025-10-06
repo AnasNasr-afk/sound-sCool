@@ -1,9 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
+import 'package:sounds_cool/data/models/user_model.dart';
+import 'package:sounds_cool/presentation/widgets/authWidgets/auth_bloc_listener.dart';
 
+import '../../business_logic/authCubit/auth_cubit.dart';
 import '../../helpers/color_manager.dart';
 import '../../helpers/components.dart';
 import '../../helpers/text_styles.dart';
+import '../widgets/settingsWidgets/settings_bloc_listener.dart';
 import '../widgets/settingsWidgets/settings_group.dart';
 import '../widgets/settingsWidgets/settings_item.dart';
 
@@ -12,53 +20,43 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var cubit = SettingsCubit.get(context);
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       backgroundColor: ColorManager.backgroundColor2,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
         leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              boxShadow: [
-                BoxShadow(
-                  color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.arrow_back_ios_new,
-              size: 18.w,
-              color: ColorManager.mainBlack,
-            ),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            size: 18.w,
+            color: ColorManager.mainBlack,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-
         title: Text(
           'Settings',
           style: TextStyles.font20BlackBold.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Profile header card - clickable for edit profile
+            // Your existing profile header card
             InkWell(
               onTap: () {
-                ///TODO: Navigate to Edit Profile Screen
+                // TODO: Navigate to Edit Profile Screen
               },
               borderRadius: BorderRadius.circular(16.r),
               child: Container(
@@ -71,7 +69,7 @@ class SettingsScreen extends StatelessWidget {
                       color: ColorManager.darkGrey.withValues(alpha: 0.3),
                       spreadRadius: 0,
                       blurRadius: 1,
-                      offset: const Offset(1, 3), // changes position of shadow
+                      offset: const Offset(1, 3),
                     ),
                   ],
                 ),
@@ -82,19 +80,21 @@ class SettingsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Anas Nasr",
+                            user?.displayName ?? "Guest",
                             style: TextStyles.font20BlackBold.copyWith(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w600,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(height: 4.h),
+
                           Text(
-                            "anasnasr1234@gmail.com",
+                            user?.email ?? "No email",
                             style: TextStyles.font16LightBlackSemiBold.copyWith(
                               fontSize: 14.sp,
                               color: Colors.grey.shade600,
                               fontWeight: FontWeight.w400,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -124,12 +124,12 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 12.w),
-                        Icon(
-                          Icons.chevron_right,
-                          color: Colors.grey.shade400,
-                          size: 24.sp,
-                        ),
+                        // SizedBox(width: 12.w),
+                        // Icon(
+                        //   Icons.chevron_right,
+                        //   color: Colors.grey.shade400,
+                        //   size: 24.sp,
+                        // ),
                       ],
                     ),
                   ],
@@ -139,7 +139,7 @@ class SettingsScreen extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            ///Account Section
+            // Your existing sections...
             SettingsSection(
               title: "Account",
               children: [
@@ -167,7 +167,6 @@ class SettingsScreen extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            /// Support & Info Section
             SettingsSection(
               title: "Support & Info",
               children: [
@@ -216,7 +215,7 @@ class SettingsScreen extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            /// Actions Section
+            // Actions Section with updated Sign Out
             SettingsSection(
               title: "Actions",
               children: [
@@ -225,7 +224,13 @@ class SettingsScreen extends StatelessWidget {
                   title: "Sign Out",
                   destructive: true,
                   onTap: () {
-                    showSignOutDialog(context);
+                    showSignOutDialog(
+                      context, // Updated to use AuthCubit for sign out
+                      onConfirm: () {
+                        Navigator.of(context).pop(); // Close dialog
+                        context.read<SettingsCubit>().signOut();
+                      },
+                    );
                   },
                 ),
                 SettingsItem(
@@ -233,14 +238,24 @@ class SettingsScreen extends StatelessWidget {
                   title: "Delete Account",
                   destructive: true,
                   onTap: () {
-                    showDeleteAccountDialog(context);
+                    showPasswordDialog(
+                      context,
+                      onConfirm: (password) {
+                        context.read<SettingsCubit>().deleteAccount(password);
+                      },
+                    );
                   },
                 ),
+
+
+
               ],
             ),
 
             SizedBox(height: 40.h),
+            SettingsBlocListener(),
           ],
+
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../data/models/generate_text_request.dart';
 import '../../data/networking/api_service.dart';
+import '../../helpers/session_tracking_helper.dart';
 import 'home_states.dart';
 
 enum Stage { generate, record, analyze }
@@ -24,6 +25,10 @@ class HomeCubit extends Cubit<HomeStates> {
 
   String selectedLevel = "A2";
   String? expandedSection;
+
+  // ===== Session Tracking =====
+  int completedSessions = 0;
+  int totalRecordings = 0;
 
   // ===== Recording Stage =====
   bool isRecording = false;
@@ -63,6 +68,19 @@ class HomeCubit extends Cubit<HomeStates> {
     _elapsedSeconds = 0;
   }
 
+  // ==================== Session Tracking ====================
+  Future<void> loadSessionStats() async {
+    completedSessions = await SessionTrackingHelper.getCompletedSessions();
+    totalRecordings = await SessionTrackingHelper.getTotalRecordings();
+    emit(SessionStatsLoadedState(completedSessions, totalRecordings));
+  }
+
+  Future<void> completeSession() async {
+    await SessionTrackingHelper.incrementSession();
+    completedSessions = await SessionTrackingHelper.getCompletedSessions();
+    emit(SessionCompletedState(completedSessions));
+  }
+
   // ==================== Generate Stage ====================
   Future<void> generatePracticeText(GenerateTextRequest request) async {
     emit(GenerateTextLoadingState());
@@ -89,7 +107,6 @@ class HomeCubit extends Cubit<HomeStates> {
       onError: (error) {
         print('Speech recognition error: ${error.errorMsg}');
 
-        // Auto-restart on timeout
         if (error.errorMsg.contains('timeout') && isRecording) {
           print('Timeout detected, restarting...');
           Future.delayed(const Duration(milliseconds: 500), () {
@@ -104,7 +121,6 @@ class HomeCubit extends Cubit<HomeStates> {
       onStatus: (status) {
         print('Speech status: $status');
 
-        // Restart when done but still recording
         if (status == 'done' && isRecording && _elapsedSeconds < _maxRecordingSeconds) {
           print('Speech done, restarting...');
           Future.delayed(const Duration(milliseconds: 300), () {
@@ -129,22 +145,15 @@ class HomeCubit extends Cubit<HomeStates> {
     _speech!.listen(
       onResult: (result) {
         if (result.recognizedWords.isNotEmpty) {
-          // Always keep accumulating - don't replace unless it's clearly a continuation
           String newWords = result.recognizedWords;
 
-          // If current is empty, just set it
           if (currentRecognizedWords.isEmpty) {
             currentRecognizedWords = newWords;
-          }
-          // If new words are longer and contain what we have, it's an update (not new)
-          else if (newWords.contains(currentRecognizedWords)) {
+          } else if (newWords.contains(currentRecognizedWords)) {
             currentRecognizedWords = newWords;
-          }
-          // If what we have doesn't contain the new words, append them
-          else if (!currentRecognizedWords.contains(newWords)) {
+          } else if (!currentRecognizedWords.contains(newWords)) {
             currentRecognizedWords += ' ' + newWords;
           }
-          // Otherwise keep what we have (it's probably the same or a subset)
         }
 
         if (result.finalResult) {
@@ -185,8 +194,6 @@ class HomeCubit extends Cubit<HomeStates> {
     emit(RecordInProgressState(currentRecognizedWords));
 
     _startRecordingTimer();
-
-    // Start listening using the restart method
     await _restartListening();
   }
 
@@ -206,6 +213,11 @@ class HomeCubit extends Cubit<HomeStates> {
 
     finalText = _cleanupRecognizedText(finalText);
     finalRecordedText = finalText;
+
+    // Increment recording count
+    await SessionTrackingHelper.incrementRecording();
+    totalRecordings = await SessionTrackingHelper.getTotalRecordings();
+
     emit(RecordSuccessState(finalText));
   }
 

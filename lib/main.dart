@@ -1,13 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sounds_cool/helpers/color_manager.dart';
 import 'package:sounds_cool/routing/app_router.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+  );
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
 
@@ -42,17 +51,17 @@ class SoundsCoolApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       child: MaterialApp(
+        //set background color
+
+        theme: ThemeData(
+          scaffoldBackgroundColor: ColorManager.backgroundColor2,
+        ),
         title: 'Sounds Cool',
         debugShowCheckedModeBanner: false,
         initialRoute: isLoggedIn ? Routes.homeScreen : Routes.authScreen,
           // initialRoute: Routes.authScreen,
         onGenerateRoute: appRouter.onGenerateRoute,
-        //status bar color
-    //     theme: ThemeData(
-    //       appBarTheme: const AppBarTheme(backgroundColor: Colors.white, foregroundColor: Colors.black,
-    // elevation: 0
-    //       ),
-    //     ),
+
       ),
     );
   }

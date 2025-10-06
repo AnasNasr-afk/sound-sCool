@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sounds_cool/business_logic/authCubit/auth_cubit.dart';
+import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
 import 'package:sounds_cool/data/networking/api_service.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
@@ -27,10 +28,19 @@ class AppRouter {
           ),
         );
       case Routes.settingsScreen:
-        return MaterialPageRoute(builder: (_) => SettingsScreen());
+        return PageRouteBuilder(
+          settings: settings,
+          pageBuilder: (_, __, ___) => BlocProvider(
+            create: (_) => SettingsCubit(),
+            child: const SettingsScreen(),
+          ),
+          transitionDuration: const Duration(milliseconds: 300),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        );
 
-        
-        
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

@@ -151,6 +151,7 @@ class TextRecordingStage extends StatelessWidget {
                   cubit.startRecording();
                 },
               ),
+
           ],
         );
       },
