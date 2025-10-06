@@ -64,7 +64,8 @@ class TextAnalyzeStage extends StatelessWidget {
                     label: "New Text",
                     icon: Icons.add,
                     backgroundColor: ColorManager.darkGrey,
-                    onPressed: () {
+                    onPressed: () async {
+                      await cubit.completeSession(); // Wait for completion
                       cubit.goToStage(Stage.generate);
                     },
                   ),

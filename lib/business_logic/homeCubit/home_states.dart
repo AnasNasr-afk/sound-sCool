@@ -63,3 +63,15 @@ class SoundLevelChangedState extends HomeStates {
   final double level;
   SoundLevelChangedState(this.level);
 }
+
+// Session Tracking States
+class SessionStatsLoadedState extends HomeStates {
+  final int sessions;
+  final int recordings;
+  SessionStatsLoadedState(this.sessions, this.recordings);
+}
+
+class SessionCompletedState extends HomeStates {
+  final int totalSessions;
+  SessionCompletedState(this.totalSessions);
+}

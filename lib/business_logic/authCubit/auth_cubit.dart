@@ -100,4 +100,5 @@ class AuthCubit extends Cubit<AuthStates> {
       emit(LoginErrorState("Something went wrong"));
     }
   }
+
 }
