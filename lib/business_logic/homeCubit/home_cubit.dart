@@ -21,7 +21,14 @@ class HomeCubit extends Cubit<HomeStates> {
   String selectedLanguage = "German";
   bool isAnalyzing = false;
 
-  final languages = {"English": "en-US", "German": "de-DE"};
+  final languages = {
+    "English": "en-US",
+    "German": "de-DE",
+    "Italian": "it-IT",
+    "French": "fr-FR",
+    "Spanish": "es-ES",
+  };
+
 
   String selectedLevel = "A2";
   String? expandedSection;
@@ -105,10 +112,10 @@ class HomeCubit extends Cubit<HomeStates> {
 
     bool available = await _speech!.initialize(
       onError: (error) {
-        print('Speech recognition error: ${error.errorMsg}');
+
 
         if (error.errorMsg.contains('timeout') && isRecording) {
-          print('Timeout detected, restarting...');
+
           Future.delayed(const Duration(milliseconds: 500), () {
             if (isRecording && _elapsedSeconds < _maxRecordingSeconds) {
               _restartListening();
@@ -119,10 +126,10 @@ class HomeCubit extends Cubit<HomeStates> {
         }
       },
       onStatus: (status) {
-        print('Speech status: $status');
+
 
         if (status == 'done' && isRecording && _elapsedSeconds < _maxRecordingSeconds) {
-          print('Speech done, restarting...');
+
           Future.delayed(const Duration(milliseconds: 300), () {
             if (isRecording) {
               _restartListening();
@@ -152,7 +159,7 @@ class HomeCubit extends Cubit<HomeStates> {
           } else if (newWords.contains(currentRecognizedWords)) {
             currentRecognizedWords = newWords;
           } else if (!currentRecognizedWords.contains(newWords)) {
-            currentRecognizedWords += ' ' + newWords;
+            currentRecognizedWords += ' $newWords';
           }
         }
 

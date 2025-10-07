@@ -97,6 +97,9 @@ class SelectLanguage extends StatelessWidget {
   Map<String, String> get _languageFlags => {
     "German": "assets/images/germany.png",
     "English": "assets/images/English.png",
+    "Italian": "assets/images/italy.png",
+    "Spanish": "assets/images/spain.png",
+    "French": "assets/images/france.png",
   };
 
   /// Builds the expanded content depending on cubit state
@@ -115,22 +118,49 @@ class SelectLanguage extends StatelessWidget {
   Widget _buildLanguageOptions(HomeCubit cubit) {
     return Padding(
       padding: EdgeInsets.only(top: 12.h),
-      child: Row(
-        children: [
-          LanguageItem(
-            text: "German",
-            assetPath: _languageFlags["German"]!,
-            isSelected: cubit.selectedLanguage == "German",
-            onTap: () => cubit.selectLanguage("German"),
-          ),
-          SizedBox(width: 10.w),
-          LanguageItem(
-            text: "English",
-            assetPath: _languageFlags["English"]!,
-            isSelected: cubit.selectedLanguage == "English",
-            onTap: () => cubit.selectLanguage("English"),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        child: Row(
+          children: [
+            LanguageItem(
+              text: "German",
+              assetPath: _languageFlags["German"]!,
+              isSelected: cubit.selectedLanguage == "German",
+              onTap: () => cubit.selectLanguage("German"),
+            ),
+            SizedBox(width: 10.w),
+            LanguageItem(
+              text: "English",
+              assetPath: _languageFlags["English"]!,
+              isSelected: cubit.selectedLanguage == "English",
+              onTap: () => cubit.selectLanguage("English"),
+            ),
+            SizedBox(width: 10.w),
+            LanguageItem(
+              text: "Italian",
+              assetPath: _languageFlags["Italian"]!,
+              isSelected: cubit.selectedLanguage == "Italian",
+              onTap: () => cubit.selectLanguage("Italian"),
+            ),
+            SizedBox(width: 10.w),
+            LanguageItem(
+              text: "Spanish",
+              assetPath: _languageFlags["Spanish"]!,
+              isSelected: cubit.selectedLanguage == "Spanish",
+              onTap: () => cubit.selectLanguage("Spanish"),
+            ),
+            SizedBox(width: 10.w),
+            LanguageItem(
+              text: "French",
+              assetPath: _languageFlags["French"]!,
+              isSelected: cubit.selectedLanguage == "French",
+              onTap: () => cubit.selectLanguage("French"),
+            ),
+
+
+          ],
+        ),
       ),
     );
   }

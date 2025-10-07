@@ -4,10 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
-import 'package:sounds_cool/data/models/user_model.dart';
-import 'package:sounds_cool/presentation/widgets/authWidgets/auth_bloc_listener.dart';
 
-import '../../business_logic/authCubit/auth_cubit.dart';
 import '../../helpers/color_manager.dart';
 import '../../helpers/components.dart';
 import '../../helpers/text_styles.dart';
@@ -20,7 +17,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cubit = SettingsCubit.get(context);
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       backgroundColor: ColorManager.backgroundColor2,

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../business_logic/authCubit/auth_cubit.dart';
 import '../../../business_logic/authCubit/auth_states.dart';
-import '../../../helpers/color_manager.dart';
 import '../../../helpers/components.dart';
 import '../../../routing/routes.dart';
 

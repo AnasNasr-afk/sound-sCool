@@ -164,7 +164,7 @@ class TextRecordingStage extends StatelessWidget {
     double normalizedLevel = (soundLevel + 2) / 12;
     normalizedLevel = normalizedLevel.clamp(0.0, 1.0);
 
-    return Container(
+    return SizedBox(
       height: 50.h,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

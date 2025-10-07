@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../../business_logic/homeCubit/home_cubit.dart';
 import '../../../../../../business_logic/homeCubit/home_states.dart';
 import '../../../../../../helpers/color_manager.dart';
-import '../../../../../../helpers/text_styles.dart';
 import '../components/action_button.dart';
 import '../components/analyzing_animation.dart';
 

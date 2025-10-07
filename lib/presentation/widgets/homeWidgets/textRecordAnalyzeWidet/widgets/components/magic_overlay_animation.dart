@@ -136,7 +136,7 @@ class _MagicOverlayAnimationState extends State<MagicOverlayAnimation>
                   ),
                 ),
               );
-            }).toList(),
+            }),
 
             // Center magic burst
             Center(
