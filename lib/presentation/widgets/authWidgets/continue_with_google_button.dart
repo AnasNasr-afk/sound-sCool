@@ -26,7 +26,7 @@ class ContinueWithGoogleButton extends StatelessWidget {
         color: Colors.grey[50], // Match background
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06), // Softer shadow
+            color: Colors.black.withValues(alpha: 0.06), // Softer shadow
             blurRadius: 6.r,
             offset: Offset(0, 2.h),
           ),
