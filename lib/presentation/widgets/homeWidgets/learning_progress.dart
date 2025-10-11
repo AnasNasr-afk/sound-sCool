@@ -41,11 +41,10 @@ class LearningProgress extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('This Month', style: TextStyles.font14GreyRegular),
-                        Text('${cubit.completedSessions} sessions',
+                        Text('${cubit.monthlyCompletedSessions} sessions',
                             style: TextStyles.font20BlackBold),
                       ],
                     ),
@@ -98,7 +97,7 @@ class LearningProgress extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('${cubit.totalRecordings}/7',
+                        Text('${cubit.dailyRecordings}/7',
                             style: TextStyles.font10BlackSemiBold),
                         SizedBox(width: 4.w),
                         Text('FREE', style: TextStyles.font10BlackSemiBold),

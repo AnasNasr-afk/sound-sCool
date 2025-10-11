@@ -19,24 +19,52 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
+    final bool useGradient = backgroundColor == null;
+
+    return Container(
+      width: double.infinity.w,
+      height: 50.h,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.mainBlack.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        gradient: useGradient
+            ? LinearGradient(
+          colors: [
+            ColorManager.gradientLightDark,
+            ColorManager.mainGreen,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )
+            : null,
+        color: backgroundColor, // used if no gradient
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: TextButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, size: 18.sp),
-        label: Text(label , style: TextStyles.font16BlackSemiBold.copyWith(
-            color: Colors.white,
-          fontSize: 14.sp
+        icon: Icon(icon, size: 18.sp, color: ColorManager.whiter),
+        label: Text(
+          label,
+          style: TextStyles.font16BlackSemiBold.copyWith(
+            color: ColorManager.whiter,
+            fontSize: 14.sp,
           ),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? ColorManager.mainGreen,
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+        style: ButtonStyle(
+          overlayColor: WidgetStatePropertyAll(Colors.transparent),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
           ),
-          elevation: 2,
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(vertical: 14.h),
+          ),
         ),
       ),
     );

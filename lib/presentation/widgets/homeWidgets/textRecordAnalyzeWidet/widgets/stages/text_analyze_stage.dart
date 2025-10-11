@@ -12,7 +12,14 @@ class TextAnalyzeStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeStates>(
+    return BlocConsumer<HomeCubit, HomeStates>(
+      listener: (context, state) {
+        // Show celebration when session completes
+        if (state is SessionCompletedState) {
+          _showSessionCompletedSnackbar(context);
+        }
+
+      },
       builder: (context, state) {
         final cubit = HomeCubit.get(context);
         if (cubit.isAnalyzing) {
@@ -51,7 +58,6 @@ class TextAnalyzeStage extends StatelessWidget {
                   child: ActionButton(
                     label: "Try Again",
                     icon: Icons.refresh,
-                    backgroundColor: ColorManager.mainGreen,
                     onPressed: () {
                       cubit.goToStage(Stage.record);
                     },
@@ -64,7 +70,32 @@ class TextAnalyzeStage extends StatelessWidget {
                     icon: Icons.add,
                     backgroundColor: ColorManager.darkGrey,
                     onPressed: () async {
-                      await cubit.completeSession(); // Wait for completion
+                      // Show loading indicator
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Text('Saving session...'),
+                            ],
+                          ),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: ColorManager.mainGreen,
+                        ),
+                      );
+
+                      // Complete session and wait
+                      await cubit.completeSession();
+
+                      // Go to generate stage
                       cubit.goToStage(Stage.generate);
                     },
                   ),
@@ -74,6 +105,34 @@ class TextAnalyzeStage extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  void _showSessionCompletedSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.celebration, color: Colors.white, size: 20),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Session completed! 🎉',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: ColorManager.mainGreen,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+      ),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../../business_logic/homeCubit/home_cubit.dart';
 import '../../../../../../business_logic/homeCubit/home_states.dart';
+import '../../../../../../helpers/components.dart';
 import '../../../../../../helpers/text_styles.dart';
 import '../components/action_button.dart';
 import '../components/magic_overlay_animation.dart';
@@ -45,7 +46,8 @@ class TextRecordingStage extends StatelessWidget {
 
         String displayText = "";
 
-        if (cubit.finalRecordedText != null && cubit.finalRecordedText!.isNotEmpty) {
+        if (cubit.finalRecordedText != null &&
+            cubit.finalRecordedText!.isNotEmpty) {
           displayText = cubit.finalRecordedText!;
         } else if (cubit.isRecording) {
           if (cubit.currentRecognizedWords.isNotEmpty) {
@@ -74,8 +76,9 @@ class TextRecordingStage extends StatelessWidget {
             // Timer UI (only when recording)
             if (cubit.isRecording) ...[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
+
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -109,6 +112,7 @@ class TextRecordingStage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Spacer(),
                   Container(
                     width: 65.w,
                     height: 65.w,
@@ -134,7 +138,7 @@ class TextRecordingStage extends StatelessWidget {
                       splashRadius: 30.r,
                     ),
                   ),
-
+                  Spacer(),
                   _buildAudioVisualization(cubit.currentSoundLevel),
                 ],
               ),
@@ -146,12 +150,22 @@ class TextRecordingStage extends StatelessWidget {
               ActionButton(
                 label: "Start Recording",
                 icon: Icons.mic,
-                backgroundColor: ColorManager.mainGreen,
-                onPressed: () {
-                  cubit.startRecording();
+                // backgroundColor: ColorManager.mainGreen,
+                onPressed: () async {
+                  ///TODO : Check daily limit before starting recording
+                  if (!cubit.isRecording) {
+                    // Check if user can record today
+                    bool canRecord = await cubit.canRecordToday();
+
+                    if (!canRecord) {
+                      // Show limit dialog
+                      DailyLimitDialog.show(context);
+                      return;
+                    }
+                    cubit.startRecording();
+                  }
                 },
               ),
-
           ],
         );
       },

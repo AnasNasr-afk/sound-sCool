@@ -26,13 +26,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     context.read<HomeCubit>().loadSessionStats();
+
+    // context.read<HomeCubit>().initDailyLimits();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorManager.backgroundColor2,
-      // floatingActionButton: const HomeFloatingActionButton(),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -41,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
               // Layer 1: Header
               HomeScreenHeader(),
               SizedBox(height: 20.h),
-              // const DebugInfoWidget(),
               // Layer 2
               LearningProgress(),
               SizedBox(height: 20.h),

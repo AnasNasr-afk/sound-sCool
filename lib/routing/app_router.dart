@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sounds_cool/business_logic/authCubit/auth_cubit.dart';
 import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
 import 'package:sounds_cool/data/networking/api_service.dart';
+import 'package:sounds_cool/data/networking/user_limits_service.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
 import '../business_logic/homeCubit/home_cubit.dart';
@@ -16,7 +18,11 @@ class AppRouter {
       case Routes.homeScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => HomeCubit(ApiService()),
+            create: (context) => HomeCubit(
+              ApiService(),
+              UserLimitsService(),
+              FirebaseAuth.instance.currentUser!.uid,
+            ),
             child: HomeScreen(),
           ),
         );
@@ -39,7 +45,6 @@ class AppRouter {
             return FadeTransition(opacity: animation, child: child);
           },
         );
-
 
       default:
         return MaterialPageRoute(

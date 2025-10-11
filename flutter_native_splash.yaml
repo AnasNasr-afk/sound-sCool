@@ -1,0 +1,19 @@
+flutter_native_splash:
+  color: "#14B8A6"
+  image: assets/images/splashScreen.png
+
+  android_12:
+    color: "#14B8A6"
+    image: assets/images/androidSplashScreen.png
+
+
+
+  android: true
+  ios: true
+
+  ios_content_mode: scaleAspectFill
+
+  fullscreen: true
+
+  info_plist_files:
+    - 'ios/Runner/Info.plist'

@@ -63,6 +63,8 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   child: TabBar(
                     controller: _tabController,
+                    splashFactory: NoSplash.splashFactory,
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(25.r),
                       color: Colors.white,

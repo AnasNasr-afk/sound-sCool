@@ -10,6 +10,7 @@ import 'package:sounds_cool/routing/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -17,10 +18,10 @@ void main() async {
       statusBarBrightness: Brightness.light,
     ),
   );
+
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
 
-  // Use Firebase Auth instead of SharedPreferences for initial check
   final User? currentUser = FirebaseAuth.instance.currentUser;
   final bool isLoggedIn = currentUser != null;
 
@@ -51,17 +52,27 @@ class SoundsCoolApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       child: MaterialApp(
-        //set background color
-
-        theme: ThemeData(
-          scaffoldBackgroundColor: ColorManager.backgroundColor2,
-        ),
         title: 'Sounds Cool',
         debugShowCheckedModeBanner: false,
         initialRoute: isLoggedIn ? Routes.homeScreen : Routes.authScreen,
-          // initialRoute: Routes.authScreen,
         onGenerateRoute: appRouter.onGenerateRoute,
-
+        theme: ThemeData(
+          scaffoldBackgroundColor: ColorManager.backgroundColor2,
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.dark,
+              statusBarBrightness: Brightness.light,
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: ColorManager.mainBlack,
+            selectionColor: ColorManager.mainBlack.withValues(alpha: 0.25),
+            selectionHandleColor: ColorManager.mainBlack,
+          ),
+        ),
       ),
     );
   }

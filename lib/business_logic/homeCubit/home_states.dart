@@ -13,9 +13,15 @@ class GenerateTextSuccessState extends HomeStates {
 }
 
 class GenerateTextErrorState extends HomeStates {
-  final String error;
-  GenerateTextErrorState(this.error);
+  final String errorMessage;
+  final String errorType;
+
+  GenerateTextErrorState({
+    required this.errorMessage,
+    required this.errorType,
+  });
 }
+
 
 // UI Selection States
 class LanguageSelectedState extends HomeStates {
@@ -75,3 +81,5 @@ class SessionCompletedState extends HomeStates {
   final int totalSessions;
   SessionCompletedState(this.totalSessions);
 }
+
+class SessionStatsErrorState extends HomeStates {}

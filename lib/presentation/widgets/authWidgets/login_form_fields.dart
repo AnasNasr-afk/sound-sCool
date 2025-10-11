@@ -74,7 +74,6 @@ class _LoginFormFieldsState extends State<LoginFormFields> {
               return null;
             },
           ),
-          // SizedBox(height: 12.h),
         ],
       ),
     );

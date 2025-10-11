@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../business_logic/authCubit/auth_cubit.dart';
+import '../../../business_logic/authCubit/auth_states.dart';
 import '../../../helpers/color_manager.dart';
 import '../../../helpers/text_styles.dart';
 
@@ -10,31 +12,43 @@ class SignupButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cubit = AuthCubit.get(context);
+    return BlocBuilder<AuthCubit, AuthStates>(
+      builder: (context, state) {
+        var cubit = AuthCubit.get(context);
+        bool isLoading = state is SignupLoadingState;
 
-    return TextButton(
-      onPressed: () {
-        debugPrint("Signup button pressed");
-        cubit.signupUser();
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(ColorManager.mainGreen),
-        foregroundColor: WidgetStatePropertyAll(ColorManager.whiter),
-        minimumSize: WidgetStatePropertyAll(Size(double.infinity.w, 50.h)),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
+        return Container(
+          width: double.infinity.w,
+          height: 50.h,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                ColorManager.gradientLightDark,
+                ColorManager.mainGreen,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(16.r),
           ),
-        ),
-      ),
-      child: Text(
-        "Sign Up",
-        style: TextStyles.font14GreyRegular.copyWith(
-          color: ColorManager.whiter,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.3,
-        ),
-      ),
+          child: TextButton(
+            onPressed: isLoading ? null : () => cubit.signupUser(),
+            style: const ButtonStyle(
+              overlayColor: WidgetStatePropertyAll(Colors.transparent),
+            ),
+            child: isLoading
+                ? const CupertinoActivityIndicator(color: Colors.white)
+                : Text(
+              "Sign Up",
+              style: TextStyles.font14GreyRegular.copyWith(
+                color: ColorManager.whiter,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

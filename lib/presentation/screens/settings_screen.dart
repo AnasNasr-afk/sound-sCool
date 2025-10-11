@@ -105,27 +105,19 @@ class SettingsScreen extends StatelessWidget {
                             vertical: 6.h,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF10B981,
-                            ).withValues(alpha: 0.1),
+                            color: ColorManager.mainGreen.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Text(
                             "FREE",
                             style: TextStyles.font16LightBlackSemiBold.copyWith(
                               fontSize: 12.sp,
-                              color: const Color(0xFF10B981),
+                              color: ColorManager.mainGreen,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
                             ),
                           ),
                         ),
-                        // SizedBox(width: 12.w),
-                        // Icon(
-                        //   Icons.chevron_right,
-                        //   color: Colors.grey.shade400,
-                        //   size: 24.sp,
-                        // ),
                       ],
                     ),
                   ],
@@ -135,7 +127,6 @@ class SettingsScreen extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            // Your existing sections...
             SettingsSection(
               title: "Account",
               children: [
@@ -155,7 +146,7 @@ class SettingsScreen extends StatelessWidget {
                   trailing: Switch(
                     value: true,
                     onChanged: (value) {},
-                    activeThumbColor: const Color(0xFF10B981),
+                    activeThumbColor: ColorManager.mainGreen
                   ),
                 ),
               ],

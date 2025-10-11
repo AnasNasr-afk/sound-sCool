@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -135,3 +137,164 @@ Future<void> showPasswordDialog(
   );
 }
 
+
+
+class DailyLimitDialog {
+  static void show(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => CupertinoAlertDialog(
+        title: Padding(
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: Text(
+            'Great practice today!',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        content: Text(
+          'Come back tomorrow for more, or upgrade for unlimited sessions.',
+          style: TextStyle(
+            fontSize: 14.sp,
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Maybe Later',
+              style: TextStyle(
+                color: CupertinoColors.systemGrey,
+                fontSize: 15.sp,
+              ),
+            ),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+              // Show coming soon message
+              _showComingSoonSnackbar(context);
+            },
+            child: Text(
+              'Upgrade Now',
+              style: TextStyle(
+                color: ColorManager.mainBlue,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _showComingSoonSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.rocket_launch, color: Colors.white, size: 20),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Premium features coming soon! 🚀',
+                style: TextStyle(fontSize: 15.sp),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: ColorManager.mainBlue,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+      ),
+    );
+  }
+}
+
+
+class GenerationLimitDialog {
+  static void show(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => CupertinoAlertDialog(
+        title: Padding(
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: Text(
+            '📚 Daily Limit Reached',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        content: Text(
+          'You\'ve generated 10 texts today. Come back tomorrow for more, or stay tuned for premium features!',
+          style: TextStyle(
+            fontSize: 14.sp,
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Got it',
+              style: TextStyle(
+                color: CupertinoColors.systemGrey,
+                fontSize: 15.sp,
+              ),
+            ),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+              _showComingSoonSnackbar(context);
+            },
+            child: Text(
+              'Premium (Soon)',
+              style: TextStyle(
+                color: ColorManager.mainBlue,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _showComingSoonSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.rocket_launch, color: Colors.white, size: 20),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Premium features coming soon! 🚀',
+                style: TextStyle(fontSize: 15.sp),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: ColorManager.mainBlue,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+      ),
+    );
+  }
+}

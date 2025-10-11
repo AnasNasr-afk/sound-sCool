@@ -4,15 +4,18 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../data/models/generate_text_request.dart';
 import '../../data/networking/api_service.dart';
-import '../../helpers/session_tracking_helper.dart';
+import '../../data/networking/user_limits_service.dart';
 import 'home_states.dart';
 
 enum Stage { generate, record, analyze }
 
 class HomeCubit extends Cubit<HomeStates> {
   final ApiService apiService;
+  final UserLimitsService limitsService;
+  final String userId;
 
-  HomeCubit(this.apiService) : super(HomeInitialState());
+  HomeCubit(this.apiService, this.limitsService, this.userId)
+      : super(HomeInitialState());
 
   static HomeCubit get(context) => BlocProvider.of(context);
 
@@ -29,13 +32,13 @@ class HomeCubit extends Cubit<HomeStates> {
     "Spanish": "es-ES",
   };
 
-
   String selectedLevel = "A2";
   String? expandedSection;
 
-  // ===== Session Tracking =====
-  int completedSessions = 0;
-  int totalRecordings = 0;
+  // ===== Session Tracking (from Firestore) =====
+  int monthlyCompletedSessions = 0;  // Increments EVERY time user completes 3 stages
+  int dailyRecordings = 0;           // Resets daily
+  int dailyGenerations = 0;          // Resets daily
 
   // ===== Recording Stage =====
   bool isRecording = false;
@@ -75,35 +78,64 @@ class HomeCubit extends Cubit<HomeStates> {
     _elapsedSeconds = 0;
   }
 
-  // ==================== Session Tracking ====================
+  // ==================== Session Tracking (Firestore) ====================
   Future<void> loadSessionStats() async {
-    completedSessions = await SessionTrackingHelper.getCompletedSessions();
-    totalRecordings = await SessionTrackingHelper.getTotalRecordings();
-    emit(SessionStatsLoadedState(completedSessions, totalRecordings));
-  }
+    try {
+      final limits = await limitsService.getUserLimits(userId);
+      monthlyCompletedSessions = await limitsService.getMonthlySessionCount(userId);
 
-  Future<void> completeSession() async {
-    await SessionTrackingHelper.incrementSession();
-    completedSessions = await SessionTrackingHelper.getCompletedSessions();
-    emit(SessionCompletedState(completedSessions));
+      dailyRecordings = limits['recordings'];
+      dailyGenerations = limits['generations'];
+
+      emit(SessionStatsLoadedState(monthlyCompletedSessions, dailyRecordings));
+    } catch (e) {
+      print('Error loading session stats: $e');
+      emit(SessionStatsErrorState());
+    }
   }
 
   // ==================== Generate Stage ====================
   Future<void> generatePracticeText(GenerateTextRequest request) async {
     emit(GenerateTextLoadingState());
     try {
+      dailyGenerations = await limitsService.incrementGeneration(userId);
+
       final response = await apiService.generateText(request);
       displayedText = response.text;
       emit(GenerateTextSuccessState(response.text));
     } catch (e) {
       String errorMessage = "Something went wrong. Please try again.";
-      if (e.toString().contains("RESOURCE_EXHAUSTED")) {
-        errorMessage = "Daily free limit reached. Try again tomorrow or upgrade your plan.";
-      } else if (e.toString().contains("NETWORK")) {
-        errorMessage = "Check your internet connection.";
+      String errorType = "UNKNOWN";
+
+      if (e.toString().contains('RATE_LIMIT')) {
+        errorMessage = "Daily limit reached. Try again tomorrow or upgrade for unlimited generations.";
+        errorType = "RATE_LIMIT";
+      } else if (e.toString().contains('NO_INTERNET')) {
+        errorMessage = "No internet connection. Please check your network.";
+        errorType = "NO_INTERNET";
+      } else if (e.toString().contains('TIMEOUT')) {
+        errorMessage = "Request timed out. Please try again.";
+        errorType = "TIMEOUT";
+      } else if (e.toString().contains('SERVER_ERROR')) {
+        errorMessage = "Server is busy. Please try again in a moment.";
+        errorType = "SERVER_ERROR";
+      } else if (e.toString().contains('API_KEY_ERROR')) {
+        errorMessage = "Configuration error. Please contact support.";
+        errorType = "API_KEY_ERROR";
+      } else if (e.toString().contains('NETWORK_ERROR')) {
+        errorMessage = "Network error. Check your connection and try again.";
+        errorType = "NETWORK_ERROR";
       }
-      emit(GenerateTextErrorState(errorMessage));
+
+      emit(GenerateTextErrorState(
+        errorMessage: errorMessage,
+        errorType: errorType,
+      ));
     }
+  }
+
+  Future<bool> canGenerateToday() async {
+    return await limitsService.canGenerate(userId);
   }
 
   // ==================== Recording Stage ====================
@@ -112,10 +144,7 @@ class HomeCubit extends Cubit<HomeStates> {
 
     bool available = await _speech!.initialize(
       onError: (error) {
-
-
         if (error.errorMsg.contains('timeout') && isRecording) {
-
           Future.delayed(const Duration(milliseconds: 500), () {
             if (isRecording && _elapsedSeconds < _maxRecordingSeconds) {
               _restartListening();
@@ -126,10 +155,7 @@ class HomeCubit extends Cubit<HomeStates> {
         }
       },
       onStatus: (status) {
-
-
         if (status == 'done' && isRecording && _elapsedSeconds < _maxRecordingSeconds) {
-
           Future.delayed(const Duration(milliseconds: 300), () {
             if (isRecording) {
               _restartListening();
@@ -221,23 +247,38 @@ class HomeCubit extends Cubit<HomeStates> {
     finalText = _cleanupRecognizedText(finalText);
     finalRecordedText = finalText;
 
-    // Increment recording count
-    await SessionTrackingHelper.incrementRecording();
-    totalRecordings = await SessionTrackingHelper.getTotalRecordings();
+    try {
+      dailyRecordings = await limitsService.incrementRecording(userId);
+    } catch (e) {
+      print('Error incrementing recording: $e');
+    }
 
     emit(RecordSuccessState(finalText));
   }
 
+  Future<bool> canRecordToday() async {
+    return await limitsService.canRecord(userId);
+  }
+
   String _cleanupRecognizedText(String text) {
     if (text.isEmpty) return text;
-
     text = text[0].toUpperCase() + text.substring(1);
-
     if (!text.endsWith('.') && !text.endsWith('?') && !text.endsWith('!')) {
       text += '.';
     }
-
     return text;
+  }
+
+  // ==================== COMPLETE SESSION (INCREMENTS MONTHLY COUNTER!) ====================
+  Future<void> completeSession() async {
+    try {
+      // Increment monthly session counter
+      monthlyCompletedSessions = await limitsService.incrementSession(userId);
+
+      emit(SessionCompletedState(monthlyCompletedSessions));
+    } catch (e) {
+      print('Error completing session: $e');
+    }
   }
 
   // ==================== UI State Management ====================

@@ -1,0 +1,31 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+
+  # iOS - Use the full icon with background
+  image_path: "assets/images/appIcon.png"
+
+  # Android - Adaptive icon with gradient background IMAGE
+  adaptive_icon_foreground: "assets/images/appIcon.png"
+  adaptive_icon_background: "assets/images/appIconBackground.png"  # ← Gradient image!
+
+  # Web
+  web:
+    generate: true
+    image_path: "assets/images/appIcon.png"
+    background_color: "#14B8A6"
+    theme_color: "#14B8A6"
+
+  # Windows
+  windows:
+    generate: true
+    image_path: "assets/images/appIcon.png"
+    icon_size: 256
+
+  # macOS
+  macos:
+    generate: true
+    image_path: "assets/images/appIcon.png"
+
+  remove_alpha_ios: true
+  min_sdk_android: 21
