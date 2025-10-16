@@ -43,7 +43,12 @@ class HomeScreenHeader extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
               decoration: BoxDecoration(
+                border: Border.all(
+                  color: ColorManager.mainGrey.withValues(alpha: 0.3),
+                  width: 1.2.w,
+                ),
                 boxShadow: [
+
                   BoxShadow(
                     color: ColorManager.darkGrey.withValues(alpha: 0.3),
                     spreadRadius: 1,

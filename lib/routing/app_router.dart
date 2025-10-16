@@ -5,10 +5,13 @@ import 'package:sounds_cool/business_logic/authCubit/auth_cubit.dart';
 import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
 import 'package:sounds_cool/data/networking/api_service.dart';
 import 'package:sounds_cool/data/networking/user_limits_service.dart';
+import 'package:sounds_cool/presentation/screens/VoiceRecordsHistoryScreen.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
 import '../business_logic/homeCubit/home_cubit.dart';
+import '../presentation/screens/about_app_screen.dart';
 import '../presentation/screens/auth_screen.dart';
+import '../presentation/screens/help_faq_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/settings_screen.dart';
 
@@ -45,6 +48,10 @@ class AppRouter {
             return FadeTransition(opacity: animation, child: child);
           },
         );
+      case Routes.aboutAppScreen:
+        return MaterialPageRoute(builder: (_) => AboutAppScreen());
+        case Routes.helpFaqScreen:
+        return MaterialPageRoute(builder: (_) => HelpFaqScreen());
 
       default:
         return MaterialPageRoute(

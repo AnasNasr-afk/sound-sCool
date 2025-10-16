@@ -28,14 +28,17 @@ class SelectLanguage extends StatelessWidget {
                 padding:
                 EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 decoration: BoxDecoration(
+                  border: Border.all(
+                    color: ColorManager.mainGrey.withValues(alpha: 0.3),                    width: 1.2.w,
+                  ),
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(18.r),
                   boxShadow: [
                     BoxShadow(
-                      color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                      blurRadius: 3,
+                      color: ColorManager.darkGrey.withValues(alpha: 0.1),
+                      blurRadius: 8,
                       spreadRadius: 1,
-                      offset: const Offset(1, 3),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -96,7 +99,7 @@ class SelectLanguage extends StatelessWidget {
   /// Map languages to their flag assets
   Map<String, String> get _languageFlags => {
     "German": "assets/images/germany.png",
-    "English": "assets/images/English.png",
+    "English": "assets/images/english.png",
     "Italian": "assets/images/italy.png",
     "Spanish": "assets/images/spain.png",
     "French": "assets/images/france.png",

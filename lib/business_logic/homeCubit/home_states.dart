@@ -83,3 +83,11 @@ class SessionCompletedState extends HomeStates {
 }
 
 class SessionStatsErrorState extends HomeStates {}
+
+class SavingRecordingState extends HomeStates {}
+
+class SessionCompletedErrorState extends HomeStates {
+  final String error;
+  SessionCompletedErrorState(this.error);
+}
+class RecordingStateResetState extends HomeStates {}

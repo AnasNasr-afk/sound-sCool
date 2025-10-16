@@ -12,9 +12,6 @@ import '../widgets/stages/text_recording_stage.dart';
 
 
 
-
-
-
 class TextRecordAnalyzeWidget extends StatelessWidget {
   const TextRecordAnalyzeWidget({super.key});
 
@@ -27,14 +24,18 @@ class TextRecordAnalyzeWidget extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           width: double.infinity,
           decoration: BoxDecoration(
+            border: Border.all(
+              color: ColorManager.mainGrey.withValues(alpha: 0.3),
+              width: 1.2.w,
+            ),
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(18.r),
             boxShadow: [
               BoxShadow(
                 color: ColorManager.darkGrey.withValues(alpha: 0.1),
                 blurRadius: 8,
-                spreadRadius: 0,
-                offset: const Offset(0, 2),
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -58,8 +59,6 @@ class TextRecordAnalyzeWidget extends StatelessWidget {
 
               SizedBox(height: 16.h),
 
-              // Stage content goes here 👇
-              // Stage content goes here 👇
               Expanded(
                 child: BlocBuilder<HomeCubit, HomeStates>(
                   builder: (context, state) {
@@ -70,8 +69,6 @@ class TextRecordAnalyzeWidget extends StatelessWidget {
                     } else if (cubit.currentStage == Stage.record) {
                       return const TextRecordingStage();
                     }
-
-                    // default to generate stage
                     return const TextGeneratingStage();
                   },
                 ),

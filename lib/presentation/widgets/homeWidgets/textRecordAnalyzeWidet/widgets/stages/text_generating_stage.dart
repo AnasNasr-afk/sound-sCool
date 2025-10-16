@@ -15,9 +15,7 @@ class TextGeneratingStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocConsumer<HomeCubit, HomeStates>(
-
       listener: (context, state) {
         if (state is GenerateTextErrorState) {
           // Show specific error message
@@ -34,9 +32,7 @@ class TextGeneratingStage extends StatelessWidget {
                       size: 20,
                     ),
                     SizedBox(width: 12),
-                    Expanded(
-                      child: Text(state.errorMessage),
-                    ),
+                    Expanded(child: Text(state.errorMessage)),
                   ],
                 ),
                 backgroundColor: Colors.red.shade600,
@@ -45,21 +41,22 @@ class TextGeneratingStage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                action: state.errorType == 'NO_INTERNET' ||
-                    state.errorType == 'TIMEOUT' ||
-                    state.errorType == 'NETWORK_ERROR'
+                action:
+                    state.errorType == 'NO_INTERNET' ||
+                        state.errorType == 'TIMEOUT' ||
+                        state.errorType == 'NETWORK_ERROR'
                     ? SnackBarAction(
-                  label: 'Retry',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    final cubit = HomeCubit.get(context);
-                    final request = GenerateTextRequest(
-                      language: cubit.selectedLanguage,
-                      level: cubit.selectedLevel,
-                    );
-                    cubit.generatePracticeText(request);
-                  },
-                )
+                        label: 'Retry',
+                        textColor: Colors.white,
+                        onPressed: () {
+                          final cubit = HomeCubit.get(context);
+                          final request = GenerateTextRequest(
+                            language: cubit.selectedLanguage,
+                            level: cubit.selectedLevel,
+                          );
+                          cubit.generatePracticeText(request);
+                        },
+                      )
                     : null,
               ),
             );
@@ -98,7 +95,8 @@ class TextGeneratingStage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16.h),
-              if (state.errorType != 'RATE_LIMIT') // Don't show retry for rate limit
+              if (state.errorType !=
+                  'RATE_LIMIT') // Don't show retry for rate limit
                 ActionButton(
                   label: 'Try Again',
                   icon: Icons.refresh,
@@ -131,74 +129,89 @@ class TextGeneratingStage extends StatelessWidget {
           );
         }
 
-        // Default (initial, no text yet)
-
         return Column(
           children: [
             const Expanded(
               child: PlaceholderContainer(
                 icon: Icons.auto_awesome,
                 title: 'Ready to generate',
-                subtitle: 'Tap the button below to create practice text.',
+                subtitle: 'Tap the button below to start practicing.',
               ),
             ),
 
-            // if (cubit.isGenerationLimitReached)
-            //   Container(
-            //     height: 28.h,
-            //     decoration: BoxDecoration(
-            //       color: ColorManager.mainBlack,
-            //       borderRadius: BorderRadius.only(
-            //         topLeft: Radius.circular(16.r),
-            //         topRight: Radius.circular(16.r),
-            //         bottomLeft: Radius.circular(10.r),
-            //         bottomRight: Radius.circular(10.r),
-            //       ),
-            //     ),
-            //     alignment: Alignment.center,
-            //     child: Row(
-            //       children: [
-            //         Text(
-            //           'Session limit reached • Resets 12:00 AM',
-            //           style: TextStyle(color: Colors.white, fontSize: 12.sp),
-            //         ),
-            //
-            //       ],
-            //     ),
-            //   ),
-            // ActionButton(
-            //   label: 'Generate Text',
-            //   icon: Icons.auto_awesome,
-            //   backgroundColor: cubit.isGenerationLimitReached
-            //       ? ColorManager.mainGreen.withValues(alpha: 0.5)
-            //       : ColorManager.mainGreen ,
-            //   onPressed: cubit.isGenerationLimitReached
-            //       ? null
-            //       : () {
-            //     final request = GenerateTextRequest(
-            //       language: cubit.selectedLanguage,
-            //       level: cubit.selectedLevel,
-            //     );
-            //     cubit.generatePracticeText(request);
-            //   },
-            // ),
+            if (cubit.isGenerationLimitReached)
+              Container(
+                margin: EdgeInsets.only(bottom: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: ColorManager.mainBlack,
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Daily limit reached • Resets at 12:00 AM',
+                      style: TextStyle(
+                        color: ColorManager.whiter,
+                        fontSize: 11.sp.clamp(12, 14),
 
+                        // ensures it never drops below 12 or exceeds 14
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        GenerationLimitDialog.show(context);
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size(50.w, 20.h),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        alignment: Alignment.centerRight,
+                      ),
+                      child: Text(
+                        "Upgrade",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.sp.clamp(12, 14),
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.grey,
+                          decorationThickness: 1,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
+            // Generate button
             ActionButton(
               label: 'Generate Text',
               icon: Icons.auto_awesome,
-              onPressed: () {
-                final request = GenerateTextRequest(
-                language: cubit.selectedLanguage,
-                level: cubit.selectedLevel,
-              );
-              cubit.generatePracticeText(request);
-              },
+              backgroundColor: cubit.isGenerationLimitReached
+                  ? ColorManager.mainGreen.withValues(alpha: 0.4)
+                  : null,
+              onPressed: cubit.isGenerationLimitReached
+                  ? null
+                  : () async {
+                      // Check limit before generating
+                      bool canGenerate = await cubit.canGenerateToday();
+
+                      if (!canGenerate) {
+                        GenerationLimitDialog.show(context);
+                        return;
+                      }
+
+                      final request = GenerateTextRequest(
+                        language: cubit.selectedLanguage,
+                        level: cubit.selectedLevel,
+                      );
+                      cubit.generatePracticeText(request);
+                    },
             ),
-
-
-
-
           ],
         );
       },

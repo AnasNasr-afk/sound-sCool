@@ -1,4 +1,4 @@
-package com.example.sounds_cool;
+package com.anasnasr.soundscool;
 
 import io.flutter.embedding.android.FlutterActivity;
 

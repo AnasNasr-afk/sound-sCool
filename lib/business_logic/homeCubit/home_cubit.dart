@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -37,8 +38,10 @@ class HomeCubit extends Cubit<HomeStates> {
 
   // ===== Session Tracking (from Firestore) =====
   int monthlyCompletedSessions = 0;  // Increments EVERY time user completes 3 stages
-  int dailyRecordings = 0;           // Resets daily
-  int dailyGenerations = 0;          // Resets daily
+  int dailyRecordings = 0;
+  int dailyGenerations = 0;
+  bool isGenerationLimitReached = false;
+  File? _currentAudioFile;
 
   // ===== Recording Stage =====
   bool isRecording = false;
@@ -87,6 +90,8 @@ class HomeCubit extends Cubit<HomeStates> {
       dailyRecordings = limits['recordings'];
       dailyGenerations = limits['generations'];
 
+      isGenerationLimitReached = dailyGenerations >= 7;
+
       emit(SessionStatsLoadedState(monthlyCompletedSessions, dailyRecordings));
     } catch (e) {
       print('Error loading session stats: $e');
@@ -100,6 +105,7 @@ class HomeCubit extends Cubit<HomeStates> {
     try {
       dailyGenerations = await limitsService.incrementGeneration(userId);
 
+      isGenerationLimitReached = dailyGenerations >= 7;
       final response = await apiService.generateText(request);
       displayedText = response.text;
       emit(GenerateTextSuccessState(response.text));
@@ -281,6 +287,20 @@ class HomeCubit extends Cubit<HomeStates> {
     }
   }
 
+  // ==================== RESET RECORDING STATE ====================
+  /// Call this when starting a new session to clear all recording data
+  void resetRecordingState() {
+    currentRecognizedWords = '';
+    finalRecordedText = null;
+    _hasFinalResult = false;
+    currentSoundLevel = 0.0;
+    isRecording = false;
+    _stopRecordingTimer();
+
+    // Emit state to update UI
+    emit(RecordingStateResetState());
+  }
+
   // ==================== UI State Management ====================
   void toggleSection(String section) {
     expandedSection = expandedSection == section ? null : section;
@@ -302,6 +322,11 @@ class HomeCubit extends Cubit<HomeStates> {
   Stage currentStage = Stage.generate;
 
   void goToStage(Stage stage) {
+    // Reset recording state when going back to generate stage (new session)
+    if (stage == Stage.generate) {
+      resetRecordingState();
+    }
+
     currentStage = stage;
     emit(StageChangedState(stage));
   }
