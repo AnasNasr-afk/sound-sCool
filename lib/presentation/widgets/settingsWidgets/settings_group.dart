@@ -36,13 +36,17 @@ class SettingsSection extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: ColorManager.mainGrey.withValues(alpha: 0.3),
+              width: 1.2.w,
+            ),
+            borderRadius: BorderRadius.circular(18.r),
             boxShadow: [
               BoxShadow(
-                color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                spreadRadius: 0,
-                blurRadius: 1,
-                offset: const Offset(1, 3), // changes position of shadow
+                color: ColorManager.darkGrey.withValues(alpha: 0.1),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
               ),
             ],
           ),

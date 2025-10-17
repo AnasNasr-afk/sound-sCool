@@ -3,11 +3,8 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("com.google.gms.google-services") // ✅ Firebase / Google Sign-In support
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -40,6 +37,7 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -54,6 +52,17 @@ android {
         release {
             signingConfig = signingConfigs.getByName("release")
         }
+    }
+
+    // ✅ Enable Java 8+ compatibility + core library desugaring
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
     }
 }
 

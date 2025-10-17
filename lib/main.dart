@@ -8,9 +8,9 @@ import 'package:sounds_cool/helpers/color_manager.dart';
 import 'package:sounds_cool/routing/app_router.dart';
 import 'package:sounds_cool/routing/routes.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -57,7 +57,8 @@ class SoundsCoolApp extends StatelessWidget {
         initialRoute: isLoggedIn ? Routes.homeScreen : Routes.authScreen,
         onGenerateRoute: appRouter.onGenerateRoute,
         theme: ThemeData(
-          scaffoldBackgroundColor: ColorManager.backgroundColor2,
+          colorScheme: ColorScheme.fromSeed(seedColor: ColorManager.backgroundColor2),
+          // scaffoldBackgroundColor: ColorManager.backgroundColor2,
           appBarTheme: const AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,

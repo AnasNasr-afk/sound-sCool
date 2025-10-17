@@ -32,8 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorManager.backgroundColor2,
-
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),

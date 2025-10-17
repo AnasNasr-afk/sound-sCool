@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import '../../data/models/user_model.dart';
 import '../../helpers/shared_pref_helper.dart';
 import 'auth_states.dart';
@@ -25,54 +27,52 @@ class AuthCubit extends Cubit<AuthStates> {
   final loginFormKey = GlobalKey<FormState>();
   final signupFormKey = GlobalKey<FormState>();
 
+  // ===============================
+  // SIGN UP (Email & Password)
+  // ===============================
   Future<void> signupUser() async {
-    if (!signupFormKey.currentState!.validate()) {
-      debugPrint("Signup form validation failed");
-      return;
-    }
+    if (!signupFormKey.currentState!.validate()) return;
+
     emit(SignupLoadingState());
 
     try {
-      debugPrint(
-        "🔹 Creating user with email: ${signupEmailController.text.trim()}",
+      // Create user
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: signupEmailController.text.trim(),
+        password: signupPasswordController.text.trim(),
       );
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(
-            email: signupEmailController.text.trim(),
-            password: signupPasswordController.text.trim(),
-          );
 
       final user = userCredential.user!;
-      debugPrint("🎉 User created with UID: ${user.uid}");
-
       final fullName =
           "${signupFirstNameController.text.trim()} ${signupLastNameController.text.trim()}";
-      debugPrint("🔹 Updating display name to: $fullName");
+
       await user.updateDisplayName(fullName);
       await user.reload();
-      debugPrint("🔹 User display name updated");
 
+      // Save to Firestore
       UserModel newUser = UserModel(
         uid: user.uid,
         firstName: signupFirstNameController.text.trim(),
         lastName: signupLastNameController.text.trim(),
         email: signupEmailController.text.trim(),
+        photoUrl: user.photoURL ?? "",
+        phone: user.phoneNumber ?? "",
       );
 
-      debugPrint("🔹 Saving user to Firestore: ${newUser.toMap()}");
       await _firestore.collection("users").doc(user.uid).set(newUser.toMap());
+      await SharedPrefHelper.setData("uid", user.uid);
 
       emit(SignupSuccessState());
-      debugPrint("Emitted SignupSuccessState");
     } on FirebaseAuthException catch (e) {
-      debugPrint("FirebaseAuthException: ${e.message}");
-      emit(SignupErrorState(e.message ?? "An unknown error occurred"));
+      emit(SignupErrorState(e.message ?? "Signup failed"));
     } catch (e) {
-      debugPrint("Unexpected error: $e");
-      emit(SignupErrorState(e.toString()));
+      emit(SignupErrorState("Something went wrong"));
     }
   }
 
+  // ===============================
+  // LOGIN (Email & Password)
+  // ===============================
   Future<void> loginUser(BuildContext context) async {
     if (!loginFormKey.currentState!.validate()) return;
 
@@ -85,13 +85,8 @@ class AuthCubit extends Cubit<AuthStates> {
       );
 
       final uid = credential.user?.uid;
-
       if (uid != null) {
-        // 🔐 Store UID in local storage
-        await SharedPrefHelper.setData(
-          "uid",
-          uid,
-        );
+        await SharedPrefHelper.setData("uid", uid);
         emit(LoginSuccessState());
       }
     } on FirebaseAuthException catch (e) {
@@ -100,5 +95,56 @@ class AuthCubit extends Cubit<AuthStates> {
       emit(LoginErrorState("Something went wrong"));
     }
   }
+
+  Future<void> signInWithGoogle() async {
+    emit(GoogleSignInLoadingState());
+
+    try {
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+
+      final googleUser = await googleSignIn.authenticate();
+
+      final googleAuth = googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        emit(GoogleSignInErrorState("Failed to retrieve Google ID Token"));
+        return;
+      }
+
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+
+      final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCredential.user!;
+
+      final firestore = FirebaseFirestore.instance;
+      final userDoc = await firestore.collection("users").doc(user.uid).get();
+
+      if (!userDoc.exists) {
+        final nameParts = (user.displayName ?? "").split(" ");
+        final newUser = UserModel(
+          uid: user.uid,
+          firstName: nameParts.isNotEmpty ? nameParts.first : "",
+          lastName: nameParts.length > 1 ? nameParts.last : "",
+          email: user.email ?? "",
+          photoUrl: user.photoURL ?? "",
+        );
+        await firestore.collection("users").doc(user.uid).set(newUser.toMap());
+      }
+
+      await SharedPrefHelper.setData("uid", user.uid);
+      emit(GoogleSignInSuccessState());
+    } on FirebaseAuthException catch (e) {
+      emit(GoogleSignInErrorState(e.message ?? "Firebase login failed"));
+    } on GoogleSignInException catch (e) {
+      emit(GoogleSignInErrorState("Google Sign-In Error: ${e.code}"));
+    } catch (e) {
+      emit(GoogleSignInErrorState("Something went wrong: $e"));
+    }
+  }
+
+
 
 }

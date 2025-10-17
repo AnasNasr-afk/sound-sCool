@@ -2,6 +2,8 @@ class Routes {
   static const String authScreen = '/';
   static const String homeScreen = '/homeScreen';
   static const String settingsScreen = '/settingsScreen';
-  static const String editScreen = '/editScreen';
+  static const String voiceRecordsHistoryScreen = '/voiceRecordsHistoryScreen';
+  static const String aboutAppScreen = '/aboutAppScreen';
+  static const String helpFaqScreen = '/helpFaqScreen';
 
 }

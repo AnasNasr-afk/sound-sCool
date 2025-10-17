@@ -21,95 +21,147 @@ class LearningProgress extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 230.w,
-                height: 80.h,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                      spreadRadius: 1,
-                      blurRadius: 3,
-                      offset: const Offset(1, 3),
-                    ),
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('This Month', style: TextStyles.font14GreyRegular),
-                        Text('${cubit.monthlyCompletedSessions} sessions',
-                            style: TextStyles.font20BlackBold),
-                      ],
-                    ),
-                    Spacer(),
-                    Icon(
-                      Icons.trending_up,
-                      shadows: [
-                        Shadow(
-                          color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                      color: ColorManager.mainGreen,
-                      size: 32.w,
-                    ),
-                  ],
-                ),
+              _MonthlySession(
+                title: 'This Month',
+                value: '${cubit.monthlyCompletedSessions} sessions',
+                icon: Icons.trending_up_rounded,
+                iconColor: ColorManager.mainGreen,
               ),
-              Container(
-                width: 80.w,
-                height: 80.h,
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorManager.darkGrey.withValues(alpha: 0.3),
-                      spreadRadius: 1,
-                      blurRadius: 3,
-                      offset: const Offset(1, 3),
-                    ),
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 16.r,
-                      backgroundColor: ColorManager.mainGreen,
-                      child: Icon(
-                        Icons.mic,
-                        color: Colors.white,
-                        size: 23.w,
-                      ),
-                    ),
-                    SizedBox(height: 6.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('${cubit.dailyRecordings}/7',
-                            style: TextStyles.font10BlackSemiBold),
-                        SizedBox(width: 4.w),
-                        Text('FREE', style: TextStyles.font10BlackSemiBold),
-                      ],
-                    )
-                  ],
-                ),
+
+              _DailyLimit(
+                icon: Icons.text_fields_rounded,
+                value: '${cubit.dailyGenerations}/7',
+                label: 'FREE',
+              ),
+
+              _DailyLimit(
+                icon: Icons.mic_rounded,
+                value: '${cubit.dailyRecordings}/7',
+                label: 'FREE',
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _MonthlySession extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color iconColor;
+
+  const _MonthlySession({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80.h,
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: ColorManager.mainGrey.withValues(alpha: 0.3),
+          width: 1.2.w,
+        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.darkGrey.withValues(alpha: 0.1),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+            size: 24.w,
+          ),
+          SizedBox(width: 10.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(title, style: TextStyles.font14GreyRegular),
+              Text(
+                value,
+                style: TextStyles.font20BlackBold.copyWith(fontSize: 16.sp),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailyLimit extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _DailyLimit({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80.h,
+      width: 72.w,
+      padding: EdgeInsets.symmetric(vertical: 5.h),
+      decoration: BoxDecoration(
+
+        border: Border.all(
+          color: ColorManager.mainGrey.withValues(alpha: 0.3),
+
+          width: 1.2.w,
+        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.darkGrey.withValues(alpha: 0.1),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 16.r,
+            backgroundColor: ColorManager.mainGreen.withValues(alpha: 0.15),
+            child: Icon(icon, color: ColorManager.mainGreen, size: 18.w),
+          ),
+          SizedBox(height: 6.h),
+          Text(value, style: TextStyles.font10BlackSemiBold),
+          SizedBox(height: 2.h),
+          Text(
+            label,
+            style: TextStyles.font10BlackSemiBold.copyWith(
+              color: ColorManager.mainGreen,
+              fontSize: 8.sp,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -66,8 +66,8 @@ class TextAnalyzeStage extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ActionButton(
-                    label: "New Text",
-                    icon: Icons.add,
+                    label: "Done",
+                    icon: Icons.check_circle_outlined,
                     backgroundColor: ColorManager.darkGrey,
                     onPressed: () async {
                       // Show loading indicator
@@ -117,7 +117,7 @@ class TextAnalyzeStage extends StatelessWidget {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Session completed! 🎉',
+                'Session completed! ✅',
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,

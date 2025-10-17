@@ -25,7 +25,7 @@ class SettingsItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(18.r),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
         child: Row(
