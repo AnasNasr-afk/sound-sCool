@@ -5,9 +5,19 @@ platform :android do
   lane :firebase_distribution do
     sh "flutter clean"
     sh "flutter build apk --release --no-tree-shake-icons"
+
+    # Load .env file
+    dotenv_file = File.join(__dir__, '../../.env')
+    if File.exist?(dotenv_file)
+      File.foreach(dotenv_file) do |line|
+        key, value = line.strip.split('=', 2)
+        ENV[key] = value if key && value
+      end
+    end
+
     firebase_app_distribution(
       app: "1:870662297667:android:9ef041eceaa6862fc05cf6",
-      firebase_cli_token: "1//03M9TIbfWT9O4CgYIARAAGAMSNwF-L9IrPMJbPQbYUL_veAFGftzOluhAWfI71sKpc3uc4Y9HTJGpjpbzKR5HSVO_LSE3f1_4lrA",
+      firebase_cli_token: ENV["FIREBASE_API_KEY"],
       android_artifact_type: "APK",
       android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
       testers: "anas.mostafax0@gmail.com,ashashkimo15@gmail.com",
