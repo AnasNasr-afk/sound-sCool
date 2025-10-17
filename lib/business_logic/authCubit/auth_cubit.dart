@@ -105,11 +105,6 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final googleUser = await googleSignIn.authenticate();
 
-      if (googleUser == null) {
-        emit(GoogleSignInErrorState("Google sign-in cancelled"));
-        return;
-      }
-
       final googleAuth = googleUser.authentication;
       final idToken = googleAuth.idToken;
 
