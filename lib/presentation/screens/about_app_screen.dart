@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AboutAppScreen extends StatefulWidget {
-  const AboutAppScreen({Key? key}) : super(key: key);
+  const AboutAppScreen({super.key});
 
   @override
   State<AboutAppScreen> createState() => _AboutAppScreenState();

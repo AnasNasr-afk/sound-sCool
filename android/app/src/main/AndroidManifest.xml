@@ -1,12 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.anasnasr.soundscool">
 
-    <!-- 👇 Permissions -->
+
+<!-- 👇 Permissions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
 
 
     <application
-        android:label="sounds_cool"
+        android:label="Sounds Cool"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:870662297667:android:d600c9426d30d98dc05cf6",
+        "mobilesdk_app_id": "1:870662297667:android:9ef041eceaa6862fc05cf6",
         "android_client_info": {
-          "package_name": "com.example.sounds_cool"
+          "package_name": "com.anasnasr.soundscool"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "870662297667-n0dh54e0881po7av73kkuibr4fptbdte.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anasnasr.soundscool",
+            "certificate_hash": "75b067037028db2ddd2deec55355245b0a036fda"
+          }
+        },
+        {
+          "client_id": "870662297667-9jei49p8ggef0jdiqkkcpa6pn69nql1r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC76zaak53CuaZVRoSl2FZzlygnhE3fmxQ"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870662297667-9jei49p8ggef0jdiqkkcpa6pn69nql1r.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870662297667-4ekl70lq0ktpsqssqc2sqtb6s693173n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.soundsCool"
+              }
+            }
+          ]
         }
       }
     }
