@@ -59,31 +59,73 @@ class TextRecordingStage extends StatelessWidget {
           displayText = "Tap button to start recording";
         }
 
-        return Column(
-          children: [
-            // First container: generated text for reading
-            TextCard(
-              text: cubit.displayedText?.isEmpty ?? true
-                  ? "No practice text generated yet."
-                  : cubit.displayedText!,
-            ),
-            SizedBox(height: 12.h),
+        // FULL SCREEN MODE WHEN RECORDING
+        if (cubit.isRecording) {
+          return Column(
+            children: [
+              // Minimized reference text (top) - collapsible
+              Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: ColorManager.mainGrey.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: ColorManager.mainGrey.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Text(
+                    cubit.displayedText?.isEmpty ?? true
+                        ? "No text"
+                        : cubit.displayedText!,
+                    style: TextStyles.font12GreenMedium.copyWith(
+                      color: ColorManager.mainBlack,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
 
-            // Second container: recording text / progress
-            Expanded(child: TextCard(text: displayText)),
-            SizedBox(height: 12.h),
+              // MAIN RECORDING DISPLAY - FULL SCREEN
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ColorManager.mainGreen.withValues(alpha: 0.4),
+                      width: 2.w,
+                    ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18.r),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(10.w),
+                      child: Text(
+                        displayText,
+                        style: TextStyles.font16BlackSemiBold.copyWith(
+                          fontSize: 14.sp,
+                          color: ColorManager.mainBlack,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
 
-            // Timer UI (only when recording)
-            if (cubit.isRecording) ...[
+              // Timer & Stop Button - Bottom Controls
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
-
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 6.h,
+                      horizontal: 5.w,
+                      vertical: 5.h,
                     ),
                     decoration: BoxDecoration(
                       color: ColorManager.mainBlack,
@@ -93,26 +135,25 @@ class TextRecordingStage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          width: 10.w,
-                          height: 10.w,
+                          width: 8.w,
+                          height: 8.w,
                           decoration: const BoxDecoration(
                             color: Colors.red,
                             shape: BoxShape.circle,
                           ),
                         ),
-                        SizedBox(width: 6.w),
+                        SizedBox(width: 4.w),
                         Text(
                           cubit.timerDisplay,
                           style: TextStyles.font12GreenMedium.copyWith(
                             color: Colors.white,
-                            fontSize: 12.sp,
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Spacer(),
                   Container(
                     width: 65.w,
                     height: 65.w,
@@ -138,34 +179,47 @@ class TextRecordingStage extends StatelessWidget {
                       splashRadius: 30.r,
                     ),
                   ),
-                  Spacer(),
+
                   _buildAudioVisualization(cubit.currentSoundLevel),
                 ],
               ),
-              SizedBox(height: 12.h),
             ],
+          );
+        }
+
+        // NORMAL MODE WHEN NOT RECORDING
+        return Column(
+          children: [
+            // First container: generated text for reading
+            TextCard(
+              text: cubit.displayedText?.isEmpty ?? true
+                  ? "No practice text generated yet."
+                  : cubit.displayedText!,
+            ),
+            SizedBox(height: 12.h),
+
+            // Second container: recording text / progress
+            Expanded(
+              child: TextCard(text: displayText),
+            ),
+            SizedBox(height: 12.h),
 
             // Action button with dynamic color
-            if (!cubit.isRecording)
-              ActionButton(
-                label: "Start Recording",
-                icon: Icons.mic,
-                // backgroundColor: ColorManager.mainGreen,
-                onPressed: () async {
-                  ///TODO : Check daily limit before starting recording
-                  if (!cubit.isRecording) {
-                    // Check if user can record today
-                    bool canRecord = await cubit.canRecordToday();
+            ActionButton(
+              label: "Start Recording",
+              icon: Icons.mic,
+              onPressed: () async {
+                if (!cubit.isRecording) {
+                  bool canRecord = await cubit.canRecordToday();
 
-                    if (!canRecord) {
-                      // Show limit dialog
-                      DailyLimitDialog.show(context);
-                      return;
-                    }
-                    cubit.startRecording();
+                  if (!canRecord) {
+                    DailyLimitDialog.show(context);
+                    return;
                   }
-                },
-              ),
+                  cubit.startRecording();
+                }
+              },
+            ),
           ],
         );
       },
@@ -174,15 +228,12 @@ class TextRecordingStage extends StatelessWidget {
 
   // Audio Visualization Widget
   Widget _buildAudioVisualization(double soundLevel) {
-    // Normalize sound level (typically ranges from -2 to 10)
     double normalizedLevel = (soundLevel + 2) / 12;
     normalizedLevel = normalizedLevel.clamp(0.0, 1.0);
 
     return SizedBox(
-      height: 50.h,
+      height: 40.h,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: List.generate(7, (index) {
           // Create wave effect - bars in middle are taller
           double barMultiplier = 1.0;
