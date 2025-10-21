@@ -25,8 +25,6 @@ void main() async {
   final User? currentUser = FirebaseAuth.instance.currentUser;
   final bool isLoggedIn = currentUser != null;
 
-  debugPrint('🔥 Firebase Auth user: ${currentUser?.uid ?? "No user"}');
-  debugPrint('📱 Login status: $isLoggedIn');
 
   runApp(
     SoundsCoolApp(

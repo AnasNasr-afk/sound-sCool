@@ -2,20 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-	<key>GIDClientID</key>
-    <string>870662297667-4ekl70lq0ktpsqssqc2sqtb6s693173n.apps.googleusercontent.com</string>
-
-    <key>CFBundleURLTypes</key>
-    <array>
-      <dict>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>com.googleusercontent.apps.870662297667-4ekl70lq0ktpsqssqc2sqtb6s693173n</string>
-        </array>
-      </dict>
-    </array>
+		<key>GIDClientID</key>
+		<string>870662297667-4ekl70lq0ktpsqssqc2sqtb6s693173n.apps.googleusercontent.com</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.870662297667-4ekl70lq0ktpsqssqc2sqtb6s693173n</string>
+				</array>
+			</dict>
+		</array>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
@@ -38,7 +37,7 @@
 		<key>NSMicrophoneUsageDescription</key>
 		<string>This app needs microphone access to practice speaking exercises.</string>
 		<key>NSUserNotificationUsageDescription</key>
-        <string>We need notification permission to send you updates</string>
+		<string>We need notification permission to send you updates</string>
 		<key>NSSpeechRecognitionUsageDescription</key>
 		<string>This app needs speech recognition to convert your voice into text for practice.</string>
 		<key>CFBundleVersion</key>
