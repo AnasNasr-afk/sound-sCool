@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "870662297667-n0dh54e0881po7av73kkuibr4fptbdte.apps.googleusercontent.com",
+          "client_id": "870662297667-lfg68qsnq3alipv725eoudpuqrem2kbp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.anasnasr.soundscool",
-            "certificate_hash": "75b067037028db2ddd2deec55355245b0a036fda"
+            "certificate_hash": "f7a7a3fa6e51457cd08566b0da7e971402bd9f56"
           }
         },
         {

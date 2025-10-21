@@ -20,8 +20,8 @@ platform :android do
       firebase_cli_token: ENV["FIREBASE_API_KEY"],
       android_artifact_type: "APK",
       android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
-      testers: "anas.mostafax0@gmail.com,ashashkimo15@gmail.com",
-      release_notes: "Initial release"
+      testers: "anas.mostafax0@gmail.com",
+      release_notes: "Solving issue in google sign in release"
     )
   end
 end

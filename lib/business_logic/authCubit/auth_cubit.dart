@@ -27,20 +27,17 @@ class AuthCubit extends Cubit<AuthStates> {
   final loginFormKey = GlobalKey<FormState>();
   final signupFormKey = GlobalKey<FormState>();
 
-  // ===============================
-  // SIGN UP (Email & Password)
-  // ===============================
   Future<void> signupUser() async {
     if (!signupFormKey.currentState!.validate()) return;
 
     emit(SignupLoadingState());
 
     try {
-      // Create user
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: signupEmailController.text.trim(),
-        password: signupPasswordController.text.trim(),
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: signupEmailController.text.trim(),
+            password: signupPasswordController.text.trim(),
+          );
 
       final user = userCredential.user!;
       final fullName =
@@ -49,7 +46,6 @@ class AuthCubit extends Cubit<AuthStates> {
       await user.updateDisplayName(fullName);
       await user.reload();
 
-      // Save to Firestore
       UserModel newUser = UserModel(
         uid: user.uid,
         firstName: signupFirstNameController.text.trim(),
@@ -64,15 +60,13 @@ class AuthCubit extends Cubit<AuthStates> {
 
       emit(SignupSuccessState());
     } on FirebaseAuthException catch (e) {
-      emit(SignupErrorState(e.message ?? "Signup failed"));
+      // Pass error code instead of message
+      emit(SignupErrorState(e.code));
     } catch (e) {
       emit(SignupErrorState("Something went wrong"));
     }
   }
 
-  // ===============================
-  // LOGIN (Email & Password)
-  // ===============================
   Future<void> loginUser(BuildContext context) async {
     if (!loginFormKey.currentState!.validate()) return;
 
@@ -90,7 +84,8 @@ class AuthCubit extends Cubit<AuthStates> {
         emit(LoginSuccessState());
       }
     } on FirebaseAuthException catch (e) {
-      emit(LoginErrorState(e.message ?? "Login failed"));
+      // Pass error code instead of message
+      emit(LoginErrorState(e.code));
     } catch (e) {
       emit(LoginErrorState("Something went wrong"));
     }
@@ -105,6 +100,11 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final googleUser = await googleSignIn.authenticate();
 
+      if (googleUser == null) {
+        emit(GoogleSignInErrorState("sign-in-cancelled"));
+        return;
+      }
+
       final googleAuth = googleUser.authentication;
       final idToken = googleAuth.idToken;
 
@@ -115,8 +115,9 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final credential = GoogleAuthProvider.credential(idToken: idToken);
 
-      final userCredential =
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
       final user = userCredential.user!;
 
       final firestore = FirebaseFirestore.instance;
@@ -137,14 +138,12 @@ class AuthCubit extends Cubit<AuthStates> {
       await SharedPrefHelper.setData("uid", user.uid);
       emit(GoogleSignInSuccessState());
     } on FirebaseAuthException catch (e) {
-      emit(GoogleSignInErrorState(e.message ?? "Firebase login failed"));
+      // Pass error code instead of message
+      emit(GoogleSignInErrorState(e.code));
     } on GoogleSignInException catch (e) {
-      emit(GoogleSignInErrorState("Google Sign-In Error: ${e.code}"));
+      emit(GoogleSignInErrorState(e.toString()));
     } catch (e) {
-      emit(GoogleSignInErrorState("Something went wrong: $e"));
+      emit(GoogleSignInErrorState("Something went wrong"));
     }
   }
-
-
-
 }

@@ -172,6 +172,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   : "Already have an account? ",
                             ),
                             WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
                               child: GestureDetector(
                                 onTap: () {
                                   _tabController.animateTo(
@@ -183,6 +184,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   style: TextStyle(
                                     color: ColorManager.mainGreen,
                                     fontWeight: FontWeight.w600,
+
                                     fontSize: 14.sp,
                                   ),
                                 ),

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sounds_cool/business_logic/settingsCubit/settings_cubit.dart';
 import 'package:sounds_cool/helpers/notification_helper.dart';
