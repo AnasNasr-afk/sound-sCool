@@ -123,12 +123,9 @@ class _DailyLimit extends StatelessWidget {
     return Container(
       height: 80.h,
       width: 72.w,
-      padding: EdgeInsets.symmetric(vertical: 5.h),
       decoration: BoxDecoration(
-
         border: Border.all(
           color: ColorManager.mainGrey.withValues(alpha: 0.3),
-
           width: 1.2.w,
         ),
         color: Colors.white,
