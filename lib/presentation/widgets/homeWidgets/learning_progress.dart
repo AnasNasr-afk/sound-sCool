@@ -84,17 +84,13 @@ class _MonthlySession extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: iconColor,
-            size: 24.w,
-          ),
+          Icon(icon, color: iconColor, size: 24.w),
           SizedBox(width: 10.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(title, style: TextStyles.font14GreyRegular),
+              Text(title, style: TextStyles.font14DarkGreyRegular),
               Text(
                 value,
                 style: TextStyles.font20BlackBold.copyWith(fontSize: 16.sp),
@@ -148,13 +144,19 @@ class _DailyLimit extends StatelessWidget {
             child: Icon(icon, color: ColorManager.mainGreen, size: 18.w),
           ),
           SizedBox(height: 6.h),
-          Text(value, style: TextStyles.font10BlackSemiBold),
+          Text(
+            value,
+            style: TextStyles.font20BlackBold.copyWith(
+              fontSize: 10.sp
+            ),
+          ),
           SizedBox(height: 2.h),
           Text(
             label,
             style: TextStyles.font10BlackSemiBold.copyWith(
               color: ColorManager.mainGreen,
               fontSize: 8.sp,
+              fontWeight: FontWeight.normal,
             ),
           ),
         ],

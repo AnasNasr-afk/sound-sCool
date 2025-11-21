@@ -45,11 +45,10 @@ class TextRecordAnalyzeWidget extends StatelessWidget {
               // Header
               Text(
                 "Practice Session",
-                style: TextStyles.font16BlackSemiBold,
+                style:TextStyles.font14DarkGreyRegular
               ),
               SizedBox(height: 12.h),
 
-              // Progress Row with dynamic stage indicators
               BlocBuilder<HomeCubit, HomeStates>(
                 builder: (context, state) {
                   final cubit = HomeCubit.get(context);
@@ -57,8 +56,7 @@ class TextRecordAnalyzeWidget extends StatelessWidget {
                 },
               ),
 
-              SizedBox(height: 16.h),
-
+              SizedBox(height: 16.h), //removed Expanded child
               Expanded(
                 child: BlocBuilder<HomeCubit, HomeStates>(
                   builder: (context, state) {

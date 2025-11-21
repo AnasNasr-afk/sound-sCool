@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -41,14 +41,14 @@ class HomeCubit extends Cubit<HomeStates> {
   int dailyRecordings = 0;
   int dailyGenerations = 0;
   bool isGenerationLimitReached = false;
-  File? _currentAudioFile;
+
 
   // ===== Recording Stage =====
   bool isRecording = false;
   stt.SpeechToText? _speech;
   String currentRecognizedWords = '';
   String? finalRecordedText;
-  bool _hasFinalResult = false;
+  bool hasFinalResult = false;
   double currentSoundLevel = 0.0;
 
   // ===== Timer for Recording =====
@@ -94,7 +94,6 @@ class HomeCubit extends Cubit<HomeStates> {
 
       emit(SessionStatsLoadedState(monthlyCompletedSessions, dailyRecordings));
     } catch (e) {
-      print('Error loading session stats: $e');
       emit(SessionStatsErrorState());
     }
   }
@@ -110,6 +109,7 @@ class HomeCubit extends Cubit<HomeStates> {
       displayedText = response.text;
       emit(GenerateTextSuccessState(response.text));
     } catch (e) {
+      debugPrint('Error generating text: $e');
       String errorMessage = "Something went wrong. Please try again.";
       String errorType = "UNKNOWN";
 
@@ -126,6 +126,7 @@ class HomeCubit extends Cubit<HomeStates> {
         errorMessage = "Server is busy. Please try again in a moment.";
         errorType = "SERVER_ERROR";
       } else if (e.toString().contains('API_KEY_ERROR')) {
+        debugPrint('API Key Error: $e');
         errorMessage = "Configuration error. Please contact support.";
         errorType = "API_KEY_ERROR";
       } else if (e.toString().contains('NETWORK_ERROR')) {
@@ -196,7 +197,7 @@ class HomeCubit extends Cubit<HomeStates> {
         }
 
         if (result.finalResult) {
-          _hasFinalResult = true;
+          hasFinalResult = true;
         }
 
         emit(RecordInProgressState(currentRecognizedWords));
@@ -228,7 +229,7 @@ class HomeCubit extends Cubit<HomeStates> {
     }
 
     isRecording = true;
-    _hasFinalResult = false;
+    hasFinalResult = false;
     currentRecognizedWords = '';
     emit(RecordInProgressState(currentRecognizedWords));
 
@@ -256,7 +257,7 @@ class HomeCubit extends Cubit<HomeStates> {
     try {
       dailyRecordings = await limitsService.incrementRecording(userId);
     } catch (e) {
-      print('Error incrementing recording: $e');
+      debugPrint('Error incrementing recording count: $e');
     }
 
     emit(RecordSuccessState(finalText));
@@ -283,7 +284,7 @@ class HomeCubit extends Cubit<HomeStates> {
 
       emit(SessionCompletedState(monthlyCompletedSessions));
     } catch (e) {
-      print('Error completing session: $e');
+      debugPrint('Error incrementing monthly session count: $e');
     }
   }
 
@@ -292,7 +293,7 @@ class HomeCubit extends Cubit<HomeStates> {
   void resetRecordingState() {
     currentRecognizedWords = '';
     finalRecordedText = null;
-    _hasFinalResult = false;
+    hasFinalResult = false;
     currentSoundLevel = 0.0;
     isRecording = false;
     _stopRecordingTimer();
@@ -322,7 +323,6 @@ class HomeCubit extends Cubit<HomeStates> {
   Stage currentStage = Stage.generate;
 
   void goToStage(Stage stage) {
-    // Reset recording state when going back to generate stage (new session)
     if (stage == Stage.generate) {
       resetRecordingState();
     }

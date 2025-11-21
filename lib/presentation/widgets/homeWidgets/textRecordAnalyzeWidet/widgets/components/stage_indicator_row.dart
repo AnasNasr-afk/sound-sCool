@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../../business_logic/homeCubit/home_cubit.dart';
 import '../../../../../../helpers/color_manager.dart';
+import '../../../../../../helpers/text_styles.dart';
 
 class StageIndicatorRow extends StatelessWidget {
   final Stage currentStage;
@@ -15,33 +16,53 @@ class StageIndicatorRow extends StatelessWidget {
     required bool active,
     required bool current,
   }) {
+    final Color activeColor = ColorManager.mainGreen; // strong accent
+    final Color activeFill = ColorManager.mainGreen.withValues(alpha: 0.12); // soft fill
+    final Color inactiveFill = ColorManager.mainGrey.withValues(alpha: 0.18);
+    final Color inactiveIcon = ColorManager.darkGrey.withValues(alpha: 0.9);
+    final double size = 36.w;
+
     return Column(
       children: [
-        Container(
-          width: 32.w,
-          height: 32.w,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: active
-                ? ColorManager.mainGreen
-                : ColorManager.mainGrey.withValues(alpha: 0.3),
-            border: current
-                ? Border.all(color: ColorManager.mainGreen, width: 2)
-                : null,
-          ),
-          child: Icon(
-            icon,
-            size: 16.sp,
-            color: active ? Colors.white : ColorManager.darkGrey,
-          ),
+        // Stack lets us show a subtle halo if current
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            if (current)
+              Container(
+                width: size + 8.w,
+                height: size + 8.w,
+                decoration: BoxDecoration(
+                  color: activeFill,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: active ? activeColor : inactiveFill,
+                border: current
+                    ? Border.all(color: activeColor, width: 1.6.w)
+                    : null,
+              ),
+              child: Icon(
+                icon,
+                size: 16.sp,
+                color: active ? Colors.white : inactiveIcon,
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 6.h),
         Text(
           label,
           style: TextStyle(
-            fontSize: 10.sp,
-            color: active ? ColorManager.mainGreen : ColorManager.darkGrey,
-            fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+            fontSize: 11.sp,
+            fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+            color: active ? activeColor : ColorManager.darkGrey,
+            height: 1.1,
           ),
         ),
       ],
@@ -53,8 +74,8 @@ class StageIndicatorRow extends StatelessWidget {
       child: Divider(
         thickness: 1,
         color: active
-            ? ColorManager.mainGreen
-            : ColorManager.mainGrey.withValues(alpha: 0.3),
+            ? ColorManager.mainGreen.withValues(alpha: 0.85)
+            : ColorManager.mainGrey.withValues(alpha: 0.18),
       ),
     );
   }
