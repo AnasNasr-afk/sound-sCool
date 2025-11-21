@@ -14,15 +14,17 @@ class TextCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: ColorManager.mainGreen.withValues(alpha: 0.05),
+        color: ColorManager.mainGrey.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: ColorManager.mainGreen.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: ColorManager.mainGrey.withValues(alpha: 0.2)),
       ),
       child: Text(
         text,
-        style: TextStyles.font14GreyRegular,
+        style: TextStyles.font12GreenMedium.copyWith(
+          color: ColorManager.mainBlack,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

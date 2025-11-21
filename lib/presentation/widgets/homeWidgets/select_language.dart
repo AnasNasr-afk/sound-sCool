@@ -25,11 +25,11 @@ class SelectLanguage extends StatelessWidget {
               // Dropdown header container
               Container(
                 width: double.infinity,
-                padding:
-                EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: ColorManager.mainGrey.withValues(alpha: 0.3),                    width: 1.2.w,
+                    color: ColorManager.mainGrey.withValues(alpha: 0.3),
+                    width: 1.2.w,
                   ),
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18.r),
@@ -51,7 +51,7 @@ class SelectLanguage extends StatelessWidget {
                         children: [
                           Text(
                             "Select Language",
-                            style: TextStyles.font14GreyRegular,
+                            style: TextStyles.font14DarkGreyRegular,
                           ),
                           SizedBox(height: 8.h),
                           GestureDetector(
@@ -70,13 +70,17 @@ class SelectLanguage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text("Select Level",
-                            style: TextStyles.font14GreyRegular),
+                        Text(
+                          "Select Level",
+                          style: TextStyles.font14DarkGreyRegular
+                        ),
                         SizedBox(height: 8.h),
                         GestureDetector(
                           onTap: () => cubit.toggleSection("level"),
-                          child: _buildDropdown(cubit.selectedLevel,
-                              isSmall: true),
+                          child: _buildDropdown(
+                            cubit.selectedLevel,
+                            isSmall: true,
+                          ),
                         ),
                       ],
                     ),
@@ -160,8 +164,6 @@ class SelectLanguage extends StatelessWidget {
               isSelected: cubit.selectedLanguage == "French",
               onTap: () => cubit.selectLanguage("French"),
             ),
-
-
           ],
         ),
       ),
@@ -177,11 +179,11 @@ class SelectLanguage extends StatelessWidget {
         children: ["A1", "A2", "B1", "B2", "C1", "C2"]
             .map(
               (level) => LevelItem(
-            text: level,
-            isSelected: cubit.selectedLevel == level,
-            onTap: () => cubit.selectLevel(level),
-          ),
-        )
+                text: level,
+                isSelected: cubit.selectedLevel == level,
+                onTap: () => cubit.selectLevel(level),
+              ),
+            )
             .toList(),
       ),
     );
@@ -244,8 +246,10 @@ class SelectLanguage extends StatelessWidget {
           Text(
             text,
             style: isSmall
-                ? TextStyles.font10BlackSemiBold
-                .copyWith(fontSize: 12.sp, color: ColorManager.mainGreen)
+                ? TextStyles.font10BlackSemiBold.copyWith(
+                    fontSize: 12.sp,
+                    color: ColorManager.mainGreen,
+                  )
                 : TextStyles.font20BlackBold,
           ),
           Icon(

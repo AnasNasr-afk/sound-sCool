@@ -1,447 +1,227 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sounds_cool/helpers/text_styles.dart';
+import 'package:sounds_cool/presentation/widgets/homeWidgets/textRecordAnalyzeWidet/widgets/components/secondary_action_button.dart';
+
 import '../../../../../../business_logic/homeCubit/home_cubit.dart';
 import '../../../../../../business_logic/homeCubit/home_states.dart';
 import '../../../../../../helpers/color_manager.dart';
-import '../components/action_button.dart';
-import '../components/analyzing_animation.dart';
 
 class TextAnalyzeStage extends StatelessWidget {
   const TextAnalyzeStage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state) {
-        // Show celebration when session completes
-        if (state is SessionCompletedState) {
-          _showSessionCompletedSnackbar(context);
-        }
-
-      },
+    return BlocBuilder<HomeCubit, HomeStates>(
       builder: (context, state) {
         final cubit = HomeCubit.get(context);
-        if (cubit.isAnalyzing) {
-          return const AnalyzingAnimation();
-        }
-        String originalText = cubit.displayedText ?? "";
-        String recordedText = cubit.finalRecordedText ?? "";
 
-        final analysis = _analyzeTexts(originalText, recordedText);
+        String original = cubit.displayedText ?? "";
+        String recorded = cubit.finalRecordedText ?? "";
 
-        return Column(
-          children: [
-            // Score Header
-            _buildScoreHeader(analysis),
-            SizedBox(height: 16.h),
+        final analysis = _analyze(original, recorded);
 
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // TITLE
+              Text(
+                "Your Result",
+                style: TextStyles.font14DarkGreyRegular.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15.sp,
+                  color: ColorManager.mainBlack,
+                ),
+              ),
+              SizedBox(height: 10.h),
+
+              // ACCURACY CARD
+              Container(
+                padding: EdgeInsets.all(14.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Only show mistakes if there are any
-                    if (analysis.missedWords > 0)
-                      _buildMissedWordsCard(analysis)
-                    else
-                      _buildPerfectScoreCard(),
+                    Text(
+                      "${analysis.accuracy.toStringAsFixed(0)}%",
+                      style: TextStyles.font30BlackSemiBold.copyWith(
+                        color: _accuracyColor(analysis.accuracy),
+                      ),
+
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "${analysis.correct} correct",
+                          style: TextStyles.font10BlackSemiBold.copyWith(
+                            // fontSize: 13.sp,
+                         fontWeight: FontWeight.w500
+                          )
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          "${analysis.missed} missed",
+                          style: TextStyles.font10BlackSemiBold.copyWith(
+                              fontWeight: FontWeight.w500,
+                                  color: Colors.red
+                          )
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 12.h),
 
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ActionButton(
-                    label: "Try Again",
-                    icon: Icons.refresh,
-                    onPressed: () {
-                      cubit.goToStage(Stage.record);
-                    },
+              SizedBox(height: 18.h),
+
+              // MISSED WORDS
+              if (analysis.missedWords.isNotEmpty) ...[
+                Text(
+                  "Words to Practice",
+                  style: TextStyles.font14DarkGreyRegular.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15.sp,
+                    color: ColorManager.mainBlack,
                   ),
                 ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: ActionButton(
-                    label: "Done",
-                    icon: Icons.check_circle_outlined,
-                    backgroundColor: ColorManager.darkGrey,
-                    onPressed: () async {
-                      // Show loading indicator
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Text('Saving session...'),
-                            ],
-                          ),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: ColorManager.mainGreen,
-                        ),
-                      );
+                SizedBox(height: 10.h),
 
-                      // Complete session and wait
-                      await cubit.completeSession();
-
-                      // Go to generate stage
-                      cubit.goToStage(Stage.generate);
-                    },
-                  ),
+                // Wrap with compact chips
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 8.h,
+                  children: analysis.missedWords.map((w) {
+                    return _compactWordChip(w);
+                  }).toList(),
                 ),
               ],
-            ),
-          ],
+
+              SizedBox(height: 20.h),
+
+              // ACTION BUTTONS (smaller)
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryActionButton(
+                      onPressed: () {
+                        cubit.goToStage(Stage.record);
+                      },
+                      label: 'Try Again',
+                      icon: Icons.refresh,
+                      backgroundColor: Colors.transparent,
+                      borderColor: ColorManager.mainGreen,
+                      textColor: ColorManager.mainBlack,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: SecondaryActionButton(
+                      onPressed: () async {
+                        await cubit.completeSession();
+                        cubit.goToStage(Stage.generate);
+                      },
+                      label: 'Done',
+                      backgroundColor: ColorManager.mainGreen,
+                      textColor: ColorManager.whiter,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  void _showSessionCompletedSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.celebration, color: Colors.white, size: 20),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Session completed! ✅',
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: ColorManager.mainGreen,
-        duration: Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.r),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoreHeader(TextAnalysis analysis) {
+  // Compact word chip: only as wide as its content
+  Widget _compactWordChip(String word) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      constraints: const BoxConstraints(minWidth: 0),
+      // important for tight sizing
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: _getAccuracyColor(analysis.accuracy).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: _getAccuracyColor(analysis.accuracy).withValues(alpha: 0.3),
-          width: 2,
-        ),
+        color: Colors.red.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8.r),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Accuracy',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: ColorManager.darkGrey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                '${analysis.accuracy.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 36.sp,
-                  fontWeight: FontWeight.bold,
-                  color: _getAccuracyColor(analysis.accuracy),
-                  height: 1,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                _getAccuracyLabel(analysis.accuracy),
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: ColorManager.darkGrey.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _buildMiniStat(
-                icon: Icons.check_circle_outline,
-                value: analysis.correctWords,
-                label: 'Correct',
-                color: ColorManager.mainGreen,
-              ),
-              SizedBox(height: 8.h),
-              _buildMiniStat(
-                icon: Icons.error_outline,
-                value: analysis.missedWords,
-                label: 'Missed',
-                color: Colors.red,
-              ),
-            ],
-          ),
-        ],
+      child: Text(
+        word,
+        style: TextStyles.font10BlackSemiBold.copyWith(
+            fontWeight: FontWeight.w500,
+            color: Colors.red,
+            fontSize: 11.sp
+
+        )
       ),
     );
   }
 
-  Widget _buildMiniStat({
-    required IconData icon,
-    required int value,
-    required String label,
-    required Color color,
-  }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16.w, color: color),
-        SizedBox(width: 4.w),
-        Text(
-          '$value',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        SizedBox(width: 4.w),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: ColorManager.darkGrey,
-          ),
-        ),
-      ],
-    );
-  }
+  // SIMPLE TEXT ANALYSIS
+  _Analysis _analyze(String original, String recorded) {
+    List<String> o = _clean(original);
+    List<String> r = _clean(recorded);
 
-  Widget _buildPerfectScoreCard() {
-    return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: ColorManager.mainGreen.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: ColorManager.mainGreen.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: ColorManager.mainGreen.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.celebration_outlined,
-              size: 48.w,
-              color: ColorManager.mainGreen,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'Perfect Score!',
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: ColorManager.mainGreen,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            'You pronounced all words correctly',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: ColorManager.darkGrey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    int correct = 0;
+    List<String> missed = [];
 
-  Widget _buildMissedWordsCard(TextAnalysis analysis) {
-    List<String> missedWordsList = [];
-    for (int i = 0; i < analysis.originalWords.length; i++) {
-      if (!analysis.matchedIndices.contains(i)) {
-        missedWordsList.add(analysis.originalWords[i]);
+    for (var w in o) {
+      if (r.contains(w.toLowerCase())) {
+        correct++;
+      } else {
+        missed.add(w);
       }
     }
 
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: ColorManager.darkGrey.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  Icons.priority_high,
-                  color: Colors.red.shade700,
-                  size: 20.w,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Words to Practice',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: ColorManager.mainBlack,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Text(
-                      'These words were not detected in your recording',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: ColorManager.darkGrey.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
-            children: missedWordsList.map((word) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(
-                    color: Colors.red.withValues(alpha: 0.25),
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  word,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    color: Colors.red.shade700,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
+    double accuracy = o.isEmpty ? 0 : (correct / o.length) * 100;
 
-  TextAnalysis _analyzeTexts(String original, String recorded) {
-    List<String> originalWords = _cleanAndSplit(original);
-    List<String> recordedWords = _cleanAndSplit(recorded);
-
-    List<String> originalLower = originalWords.map((w) => w.toLowerCase()).toList();
-    List<String> recordedLower = recordedWords.map((w) => w.toLowerCase()).toList();
-
-    Set<int> matchedIndices = {};
-    int correctWords = 0;
-
-    for (int i = 0; i < originalLower.length; i++) {
-      if (recordedLower.contains(originalLower[i])) {
-        matchedIndices.add(i);
-        correctWords++;
-      }
-    }
-
-    double accuracy = originalWords.isEmpty
-        ? 0.0
-        : (correctWords / originalWords.length) * 100;
-
-    return TextAnalysis(
-      originalWords: originalWords,
-      recordedWords: recordedWords,
-      matchedIndices: matchedIndices,
-      correctWords: correctWords,
-      missedWords: originalWords.length - correctWords,
+    return _Analysis(
       accuracy: accuracy,
+      correct: correct,
+      missed: o.length - correct,
+      missedWords: missed,
     );
   }
 
-  List<String> _cleanAndSplit(String text) {
-    if (text.isEmpty) return [];
+  List<String> _clean(String text) {
     return text
-        .replaceAll(RegExp(r'[^\w\s]'), '')
-        .split(RegExp(r'\s+'))
-        .where((word) => word.isNotEmpty)
+        .replaceAll(RegExp(r"[^\w\s]"), "")
+        .toLowerCase()
+        .split(RegExp(r"\s+"))
+        .where((w) => w.isNotEmpty)
         .toList();
   }
 
-  Color _getAccuracyColor(double accuracy) {
-    if (accuracy >= 80) return ColorManager.mainGreen;
-    if (accuracy >= 60) return Colors.orange;
+  Color _accuracyColor(double percent) {
+    if (percent >= 80) return Colors.green;
+    if (percent >= 50) return Colors.orange;
     return Colors.red;
-  }
-
-  String _getAccuracyLabel(double accuracy) {
-    if (accuracy >= 90) return 'Excellent';
-    if (accuracy >= 80) return 'Great job';
-    if (accuracy >= 60) return 'Good effort';
-    if (accuracy >= 40) return 'Keep practicing';
-    return 'Try again';
   }
 }
 
-class TextAnalysis {
-  final List<String> originalWords;
-  final List<String> recordedWords;
-  final Set<int> matchedIndices;
-  final int correctWords;
-  final int missedWords;
+class _Analysis {
   final double accuracy;
+  final int correct;
+  final int missed;
+  final List<String> missedWords;
 
-  TextAnalysis({
-    required this.originalWords,
-    required this.recordedWords,
-    required this.matchedIndices,
-    required this.correctWords,
-    required this.missedWords,
+  _Analysis({
     required this.accuracy,
+    required this.correct,
+    required this.missed,
+    required this.missedWords,
   });
 }

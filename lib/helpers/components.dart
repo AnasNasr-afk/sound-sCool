@@ -232,7 +232,7 @@ class GenerationLimitDialog {
             title: Padding(
               padding: EdgeInsets.only(bottom: 8.h),
               child: Text(
-                '📚 Daily Limit Reached',
+                'Daily Limit Reached',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -276,7 +276,7 @@ class GenerationLimitDialog {
                       ),
                       SizedBox(width: 6.w),
                       Text(
-                        'Resets at midnight',
+                        'Resets at 12:00 AM',
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: CupertinoColors.systemGrey,
@@ -310,7 +310,7 @@ class GenerationLimitDialog {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '✨ Notify Me',
+                      'Notify Me',
                       style: TextStyle(
                         color: ColorManager.mainBlue,
                         fontSize: 15.sp,

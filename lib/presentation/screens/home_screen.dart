@@ -19,43 +19,40 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   void initState() {
     super.initState();
     context.read<HomeCubit>().loadSessionStats();
-
-    // context.read<HomeCubit>().initDailyLimits();
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.h),
-          child: Column(
-            children: [
-              // Layer 1: Header
-              HomeScreenHeader(),
-              SizedBox(height: 20.h),
-              // Layer 2
-              LearningProgress(),
-              SizedBox(height: 20.h),
-              // Layer 3
-              SelectLanguage(),
-              SizedBox(height: 20.h),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.h),
+            child: Column(
+              children: [
+                // Layer 1: Header
+                HomeScreenHeader(),
+                SizedBox(height: 20.h),
+                // Layer 2
+                LearningProgress(),
+                SizedBox(height: 20.h),
+                // Layer 3
+                SelectLanguage(),
+                SizedBox(height: 20.h),
 
-
-              // Layer 4
-              TextRecordAnalyzeWidget(),
-
-
-            ],
+                // Layer 4
+                TextRecordAnalyzeWidget(),
+              ],
+            ),
           ),
         ),
-      ),
+
     );
   }
 }

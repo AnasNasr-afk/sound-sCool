@@ -6,7 +6,7 @@ import '../../../../../../business_logic/homeCubit/home_states.dart';
 import '../../../../../../helpers/components.dart';
 import '../../../../../../helpers/text_styles.dart';
 import '../components/action_button.dart';
-import '../components/magic_overlay_animation.dart';
+import '../components/analyze_loading.dart';
 import '../components/text_card.dart';
 import '../../../../../../helpers/color_manager.dart';
 
@@ -17,17 +17,35 @@ class TextRecordingStage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {
+        // if (state is RecordSuccessState) {
+        //
+        //   final cubit = HomeCubit.get(context);
+        //   cubit.goToStage(Stage.analyze);
+        //   showDialog(
+        //     context: context,
+        //     barrierDismissible: false,
+        //     barrierColor: Colors.transparent,
+        //     builder: (BuildContext context) {
+        //       return MagicOverlayAnimation(
+        //         onComplete: () {
+        //           Navigator.of(context).pop();
+        //           cubit.goToStage(Stage.analyze);
+        //         },
+        //       );
+        //     },
+        //   );
+        // }
+
         if (state is RecordSuccessState) {
           final cubit = HomeCubit.get(context);
 
           showDialog(
             context: context,
+            barrierColor: Colors.black.withOpacity(0.5),
             barrierDismissible: false,
-            barrierColor: Colors.transparent,
-            builder: (BuildContext context) {
-              return MagicOverlayAnimation(
+            builder: (context) {
+              return AnalyzeLoading(
                 onComplete: () {
-                  Navigator.of(context).pop();
                   cubit.goToStage(Stage.analyze);
                 },
               );
@@ -36,9 +54,7 @@ class TextRecordingStage extends StatelessWidget {
         }
 
         if (state is RecordErrorState) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.error)));
+
         }
       },
       builder: (context, state) {
@@ -86,32 +102,93 @@ class TextRecordingStage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 20.h),
 
               // MAIN RECORDING DISPLAY - FULL SCREEN
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: ColorManager.mainGreen.withValues(alpha: 0.4),
-                      width: 2.w,
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18.r),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.all(10.w),
-                      child: Text(
-                        displayText,
-                        style: TextStyles.font16BlackSemiBold.copyWith(
-                          fontSize: 14.sp,
-                          color: ColorManager.mainBlack,
-                          fontWeight: FontWeight.w500,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Card background + scrollable text
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: ColorManager.mainGreen.withValues(alpha: 0.4),
+                              width: 2.w,
+                            ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18.r),
+                          ),
+                          child: Padding(
+                            // Keep inner padding so positioned button does not cover text
+                            padding: EdgeInsets.fromLTRB(16.w, 16.h + 6.h, 16.w, 16.h),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                displayText,
+                                style:
+                                TextStyles.font16BlackSemiBold.copyWith(
+                                  fontSize: 14.sp,
+                                  color: ColorManager.mainBlack,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.start,
                       ),
-                    ),
+
+                      // Cancel button placed in card header area (top-right)
+                      // AnimatedOpacity gives subtle entrance/exit when recording state toggles.
+                      Positioned(
+                        top: -12.h,
+                        right: -12.w,
+                        child: AnimatedOpacity(
+                          opacity: cubit.isRecording ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOut,
+                          child: Semantics(
+                            button: true,
+                            label: 'Discard recording',
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => cubit.resetRecordingState(),
+                                borderRadius: BorderRadius.circular(24.r),
+                                child: Container(
+                                  width: 40.w,
+                                  height: 40.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: ColorManager.mainGrey,
+                                    border: Border.all(
+                                      color: ColorManager.mainGreen,
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: ColorManager.mainBlack.withValues(alpha: 0.03),
+                                        blurRadius: 6.r,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    size: 20.sp,
+                                    color: ColorManager.mainBlack,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
@@ -190,19 +267,15 @@ class TextRecordingStage extends StatelessWidget {
         // NORMAL MODE WHEN NOT RECORDING
         return Column(
           children: [
-            // First container: generated text for reading
-            TextCard(
-              text: cubit.displayedText?.isEmpty ?? true
-                  ? "No practice text generated yet."
-                  : cubit.displayedText!,
-            ),
-            SizedBox(height: 12.h),
-
-            // Second container: recording text / progress
-            Expanded(
-              child: TextCard(text: displayText),
-            ),
-            SizedBox(height: 12.h),
+            // Show generated text ONLY if available; otherwise don't render the card
+            if (cubit.displayedText != null && cubit.displayedText!.isNotEmpty) ...[
+              Expanded(
+                child: TextCard(
+                  text: cubit.displayedText!,
+                ),
+              ),
+              SizedBox(height: 12.h),
+            ],
 
             // Action button with dynamic color
             ActionButton(
@@ -266,3 +339,5 @@ class TextRecordingStage extends StatelessWidget {
     );
   }
 }
+
+

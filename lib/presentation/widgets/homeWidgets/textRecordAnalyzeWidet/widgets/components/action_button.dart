@@ -5,14 +5,14 @@ import '../../../../../../helpers/text_styles.dart';
 
 class ActionButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final IconData? icon;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
 
   const ActionButton({
     super.key,
     required this.label,
-    required this.icon,
+    this.icon,
     this.onPressed,
     this.backgroundColor,
   });
@@ -42,12 +42,17 @@ class ActionButton extends StatelessWidget {
           end: Alignment.bottomRight,
         )
             : null,
-        color: backgroundColor, // used if no gradient
+        color: useGradient ? null : backgroundColor,
         borderRadius: BorderRadius.circular(16.r),
       ),
-      child: TextButton.icon(
+      child: icon != null
+          ? TextButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon, size: 18.sp, color: ColorManager.whiter),
+        icon: Icon(
+          icon,
+          size: 18.sp,
+          color: ColorManager.whiter,
+        ),
         label: Text(
           label,
           style: TextStyles.font16BlackSemiBold.copyWith(
@@ -56,7 +61,8 @@ class ActionButton extends StatelessWidget {
           ),
         ),
         style: ButtonStyle(
-          overlayColor: WidgetStatePropertyAll(Colors.transparent),
+          overlayColor:
+          WidgetStatePropertyAll(Colors.transparent),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.r),
@@ -64,6 +70,28 @@ class ActionButton extends StatelessWidget {
           ),
           padding: WidgetStatePropertyAll(
             EdgeInsets.symmetric(vertical: 14.h),
+          ),
+        ),
+      )
+          : TextButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          overlayColor:
+          WidgetStatePropertyAll(Colors.transparent),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+          ),
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(vertical: 14.h),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyles.font16BlackSemiBold.copyWith(
+            color: ColorManager.whiter,
+            fontSize: 14.sp,
           ),
         ),
       ),
