@@ -214,33 +214,110 @@ class TextGeneratingStage extends StatelessWidget {
     );
   }
 
-  // === Action Buttons ===
+
   Widget _buildActionButtonsRow(BuildContext context) {
+    final cubit = HomeCubit.get(context);
+    final isLimitReached = cubit.isGenerationLimitReached;
+
     return Row(
       children: [
         Expanded(
           child: SecondaryActionButton(
+            onPressed: isLimitReached
+                ? () => _showLimitReachedSnackBar(context)
+                : () {
+              cubit.retryLastGeneration();
+            },
             label: 'Try Again',
             icon: Icons.refresh,
-            backgroundColor: Colors.transparent,
-            borderColor: ColorManager.mainGreen,
-            textColor: ColorManager.mainBlack,
+            backgroundColor: isLimitReached
+                ? Colors.black
+                : Colors.transparent,
+            borderColor: isLimitReached
+                ? ColorManager.mainGrey
+                : ColorManager.mainGreen,
+            textColor: isLimitReached
+                ?  ColorManager.mainGrey
+                : ColorManager.mainBlack,
           ),
         ),
         SizedBox(width: 12.w),
         Expanded(
-          child: SecondaryActionButton(
-            label: 'Dismiss',
-            icon: Icons.close,
-            onPressed: () => _dismissResult(context),
-            backgroundColor: ColorManager.mainGrey,
-            borderColor: ColorManager.mainGrey,
-            textColor: ColorManager.mainBlack,
-          )
+            child: SecondaryActionButton(
+              label: 'Dismiss',
+              icon: Icons.close,
+              onPressed: () => _dismissResult(context),
+              backgroundColor: ColorManager.mainGrey,
+              borderColor: ColorManager.mainGrey,
+              textColor: ColorManager.mainBlack,
+            )
         ),
       ],
     );
   }
+
+// Snackbar for daily limit reached
+  void _showLimitReachedSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.block,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Your daily limit has been reached. Try again tomorrow!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(12),
+      ),
+    );
+  }
+
+/*
+BETTER ALTERNATIVES:
+
+1. ✅ RED/WARNING (RECOMMENDED)
+   - Signals that action is not available
+   - Contrasts with green and grey
+   - Users understand it's disabled
+   - backgroundColor: Colors.red.withValues(alpha: 0.1)
+   - borderColor: Colors.red.withValues(alpha: 0.5)
+   - textColor: Colors.red
+
+2. ✅ ORANGE/CAUTION
+   - Less aggressive than red
+   - Still stands out
+   - backgroundColor: Colors.orange.withValues(alpha: 0.1)
+   - borderColor: Colors.orange.withValues(alpha: 0.5)
+   - textColor: Colors.orange
+
+3. ✅ LIGHT BACKGROUND ONLY (Subtle)
+   - Keep border/text same green
+   - Only fade the background
+   - backgroundColor: ColorManager.mainGreen.withValues(alpha: 0.2)
+   - borderColor: ColorManager.mainGreen.withValues(alpha: 0.3)
+   - textColor: ColorManager.mainGreen.withValues(alpha: 0.5)
+
+4. ✅ STRIKETHROUGH + DISABLED LOOK
+   - Add an X icon overlay
+   - Keep border visible
+   - Just set opacity lower
+*/
 
 
 

@@ -17,31 +17,13 @@ class TextRecordingStage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {
-        // if (state is RecordSuccessState) {
-        //
-        //   final cubit = HomeCubit.get(context);
-        //   cubit.goToStage(Stage.analyze);
-        //   showDialog(
-        //     context: context,
-        //     barrierDismissible: false,
-        //     barrierColor: Colors.transparent,
-        //     builder: (BuildContext context) {
-        //       return MagicOverlayAnimation(
-        //         onComplete: () {
-        //           Navigator.of(context).pop();
-        //           cubit.goToStage(Stage.analyze);
-        //         },
-        //       );
-        //     },
-        //   );
-        // }
 
         if (state is RecordSuccessState) {
           final cubit = HomeCubit.get(context);
 
           showDialog(
             context: context,
-            barrierColor: Colors.black.withOpacity(0.5),
+            barrierColor: Colors.black.withValues(alpha: 0.5),
             barrierDismissible: false,
             builder: (context) {
               return AnalyzeLoading(

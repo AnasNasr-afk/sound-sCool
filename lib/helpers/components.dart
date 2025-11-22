@@ -332,7 +332,6 @@ class GenerationLimitDialog {
     if (status.isGranted) {
       // Permission already granted - proceed with notification signup
       _showPremiumInterestSnackbar(context);
-      // TODO: Track interest in Firestore
       // _trackPremiumInterest(context);
     } else if (status.isDenied) {
       // Permission denied - request it
@@ -340,7 +339,6 @@ class GenerationLimitDialog {
 
       if (result.isGranted) {
         _showPremiumInterestSnackbar(context);
-        // TODO: Track interest in Firestore
         // _trackPremiumInterest(context);
       } else if (result.isPermanentlyDenied) {
         // User permanently denied - show settings dialog
@@ -488,7 +486,6 @@ class GenerationLimitDialog {
       ),
     );
 
-    // TODO: Actually track this interest in Firestore
-    // _trackPremiumInterest(context);
+
   }
 }

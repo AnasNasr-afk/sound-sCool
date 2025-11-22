@@ -49,7 +49,7 @@ class AppRouter {
         );
       case Routes.aboutAppScreen:
         return MaterialPageRoute(builder: (_) => AboutAppScreen());
-        case Routes.helpFaqScreen:
+      case Routes.helpFaqScreen:
         return MaterialPageRoute(builder: (_) => HelpFaqScreen());
 
       default:

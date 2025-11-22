@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../../business_logic/homeCubit/home_cubit.dart';
 import '../../../../../../helpers/color_manager.dart';
-import '../../../../../../helpers/text_styles.dart';
 
 class StageIndicatorRow extends StatelessWidget {
   final Stage currentStage;
