@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -60,7 +61,6 @@ class TextAnalyzeStage extends StatelessWidget {
                       style: TextStyles.font30BlackSemiBold.copyWith(
                         color: _accuracyColor(analysis.accuracy),
                       ),
-
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -69,16 +69,16 @@ class TextAnalyzeStage extends StatelessWidget {
                           "${analysis.correct} correct",
                           style: TextStyles.font10BlackSemiBold.copyWith(
                             // fontSize: 13.sp,
-                         fontWeight: FontWeight.w500
-                          )
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         SizedBox(height: 6.h),
                         Text(
                           "${analysis.missed} missed",
                           style: TextStyles.font10BlackSemiBold.copyWith(
-                              fontWeight: FontWeight.w500,
-                                  color: Colors.red
-                          )
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red,
+                          ),
                         ),
                       ],
                     ),
@@ -133,6 +133,31 @@ class TextAnalyzeStage extends StatelessWidget {
                       onPressed: () async {
                         await cubit.completeSession();
                         cubit.goToStage(Stage.generate);
+
+                      Flushbar(
+                          messageText: Text(
+                            'Session completed successfully!',
+                            textAlign: TextAlign.center,
+                            style: TextStyles.font14GreyRegular.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          margin: EdgeInsets.all(16),
+                          borderRadius: BorderRadius.circular(12),
+                          backgroundColor: Colors.green,
+                          flushbarPosition: FlushbarPosition.TOP,
+                          duration: Duration(seconds: 2),
+                          boxShadows: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          animationDuration: Duration(milliseconds: 300),
+                        ).show(context);
                       },
                       label: 'Done',
                       backgroundColor: ColorManager.mainGreen,
@@ -161,11 +186,10 @@ class TextAnalyzeStage extends StatelessWidget {
       child: Text(
         word,
         style: TextStyles.font10BlackSemiBold.copyWith(
-            fontWeight: FontWeight.w500,
-            color: Colors.red,
-            fontSize: 11.sp
-
-        )
+          fontWeight: FontWeight.w500,
+          color: Colors.red,
+          fontSize: 11.sp,
+        ),
       ),
     );
   }

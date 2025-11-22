@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -9,16 +10,32 @@ import '../../data/networking/user_limits_service.dart';
 import 'home_states.dart';
 
 enum Stage { generate, record, analyze }
+enum ConnectivityStatus { online, offline }
 
+/// Production-ready HomeCubit with safer recording flow, permission handling,
+/// connectivity debounce, and guarded debug logging.
 class HomeCubit extends Cubit<HomeStates> {
   final ApiService apiService;
   final UserLimitsService limitsService;
   final String userId;
+  final Connectivity _connectivity;
 
-  HomeCubit(this.apiService, this.limitsService, this.userId)
-      : super(HomeInitialState());
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  Timer? _connectivityDebounce; // debounce connectivity events
+
+  HomeCubit(
+      this.apiService,
+      this.limitsService,
+      this.userId, {
+        Connectivity? connectivity,
+      })  : _connectivity = connectivity ?? Connectivity(),
+        super(HomeInitialState()) {
+    _listenConnectivity();
+  }
 
   static HomeCubit get(context) => BlocProvider.of(context);
+  ConnectivityStatus _connectivityStatus = ConnectivityStatus.online;
+  ConnectivityStatus get connectivityStatus => _connectivityStatus;
 
   // ===== App State =====
   String? displayedText;
@@ -36,12 +53,11 @@ class HomeCubit extends Cubit<HomeStates> {
   String selectedLevel = "A2";
   String? expandedSection;
 
-  // ===== Session Tracking (from Firestore) =====
-  int monthlyCompletedSessions = 0;  // Increments EVERY time user completes 3 stages
+  // ===== Session Tracking =====
+  int monthlyCompletedSessions = 0;
   int dailyRecordings = 0;
   int dailyGenerations = 0;
   bool isGenerationLimitReached = false;
-
 
   // ===== Recording Stage =====
   bool isRecording = false;
@@ -51,11 +67,52 @@ class HomeCubit extends Cubit<HomeStates> {
   bool hasFinalResult = false;
   double currentSoundLevel = 0.0;
 
+  // Guards to prevent concurrent operations
+  bool _isListening = false;
+  bool _isStopping = false;
+
   // ===== Timer for Recording =====
   Timer? _recordingTimer;
   int _elapsedSeconds = 0;
   final int _maxRecordingSeconds = 30;
 
+  // ===== Generate Retry =====
+  GenerateTextRequest? _lastGenerateRequest;
+
+  // ==================== CONNECTIVITY ====================
+  void _listenConnectivity() {
+    if (kDebugMode) debugPrint("🔌 Listening to connectivity changes...");
+
+    _connectivitySub = _connectivity.onConnectivityChanged.listen((results) {
+      // debounce noisy events (connectivity_plus can be chatty)
+      _connectivityDebounce?.cancel();
+      _connectivityDebounce = Timer(const Duration(milliseconds: 300), () {
+        try {
+          if (kDebugMode) debugPrint("📡 Connectivity event: $results");
+
+          final result =
+          results.isNotEmpty ? results.first : ConnectivityResult.none;
+          if (kDebugMode) debugPrint("➡️ Connectivity interpreted as: $result");
+
+          final newStatus = (result == ConnectivityResult.none)
+              ? ConnectivityStatus.offline
+              : ConnectivityStatus.online;
+
+          if (newStatus != _connectivityStatus) {
+            if (kDebugMode) debugPrint("🌐 STATUS CHANGED: $newStatus");
+            _connectivityStatus = newStatus;
+            emit(ConnectivityChangedState(_connectivityStatus));
+          } else {
+            if (kDebugMode) debugPrint("ℹ️ Status unchanged, still: $_connectivityStatus");
+          }
+        } catch (e) {
+          if (kDebugMode) debugPrint('connectivity handler error: \$e\n\$st');
+        }
+      });
+    });
+  }
+
+  // ==================== TIMER ====================
   String get timerDisplay {
     final minutes = (_elapsedSeconds ~/ 60).toString().padLeft(1, '0');
     final seconds = (_elapsedSeconds % 60).toString().padLeft(2, '0');
@@ -70,7 +127,11 @@ class HomeCubit extends Cubit<HomeStates> {
       emit(RecordInProgressState(currentRecognizedWords));
 
       if (_elapsedSeconds >= _maxRecordingSeconds) {
-        stopRecording();
+        // guard: only call stopRecording if recording is still active
+        if (isRecording && !_isStopping) {
+          _isStopping = true;
+          stopRecording().whenComplete(() => _isStopping = false);
+        }
       }
     });
   }
@@ -81,11 +142,12 @@ class HomeCubit extends Cubit<HomeStates> {
     _elapsedSeconds = 0;
   }
 
-  // ==================== Session Tracking (Firestore) ====================
+  // ==================== SESSION TRACKING ====================
   Future<void> loadSessionStats() async {
     try {
       final limits = await limitsService.getUserLimits(userId);
-      monthlyCompletedSessions = await limitsService.getMonthlySessionCount(userId);
+      monthlyCompletedSessions =
+      await limitsService.getMonthlySessionCount(userId);
 
       dailyRecordings = limits['recordings'];
       dailyGenerations = limits['generations'];
@@ -98,23 +160,29 @@ class HomeCubit extends Cubit<HomeStates> {
     }
   }
 
-  // ==================== Generate Stage ====================
+  // ==================== GENERATE STAGE ====================
   Future<void> generatePracticeText(GenerateTextRequest request) async {
+    _lastGenerateRequest = request;
+    await _performGeneration(request);
+  }
+
+  Future<void> _performGeneration(GenerateTextRequest request) async {
     emit(GenerateTextLoadingState());
     try {
       dailyGenerations = await limitsService.incrementGeneration(userId);
-
       isGenerationLimitReached = dailyGenerations >= 7;
+
       final response = await apiService.generateText(request);
       displayedText = response.text;
       emit(GenerateTextSuccessState(response.text));
     } catch (e) {
-      debugPrint('Error generating text: $e');
+      if (kDebugMode) debugPrint('Error generating text: $e');
       String errorMessage = "Something went wrong. Please try again.";
       String errorType = "UNKNOWN";
 
       if (e.toString().contains('RATE_LIMIT')) {
-        errorMessage = "Daily limit reached. Try again tomorrow or upgrade for unlimited generations.";
+        errorMessage =
+        "Daily limit reached. Try again tomorrow or upgrade for unlimited generations.";
         errorType = "RATE_LIMIT";
       } else if (e.toString().contains('NO_INTERNET')) {
         errorMessage = "No internet connection. Please check your network.";
@@ -126,7 +194,7 @@ class HomeCubit extends Cubit<HomeStates> {
         errorMessage = "Server is busy. Please try again in a moment.";
         errorType = "SERVER_ERROR";
       } else if (e.toString().contains('API_KEY_ERROR')) {
-        debugPrint('API Key Error: $e');
+        if (kDebugMode) debugPrint('API Key Error: $e');
         errorMessage = "Configuration error. Please contact support.";
         errorType = "API_KEY_ERROR";
       } else if (e.toString().contains('NETWORK_ERROR')) {
@@ -141,108 +209,187 @@ class HomeCubit extends Cubit<HomeStates> {
     }
   }
 
+  Future<void> retryLastGeneration() async {
+    if (_lastGenerateRequest == null) {
+      emit(GenerateTextErrorState(
+        errorMessage: "No previous request to retry.",
+        errorType: "UNKNOWN",
+      ));
+      return;
+    }
+    await _performGeneration(_lastGenerateRequest!);
+  }
+
   Future<bool> canGenerateToday() async {
     return await limitsService.canGenerate(userId);
   }
 
-  // ==================== Recording Stage ====================
+  // ==================== SPEECH RECOGNITION ====================
+
   Future<void> initSpeech() async {
+    if (kDebugMode) debugPrint('initSpeech: creating SpeechToText instance');
     _speech ??= stt.SpeechToText();
 
-    bool available = await _speech!.initialize(
+    final available = await _speech!.initialize(
       onError: (error) {
-        if (error.errorMsg.contains('timeout') && isRecording) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (isRecording && _elapsedSeconds < _maxRecordingSeconds) {
-              _restartListening();
-            }
-          });
-        } else if (!error.errorMsg.contains('timeout') && isRecording) {
+        if (kDebugMode) debugPrint('speech init onError: ${error.errorMsg}');
+        // Only emit an error for serious (non-timeout) errors when recording
+        if (!error.errorMsg.contains('timeout') && isRecording) {
           emit(RecordErrorState("Recognition error: ${error.errorMsg}"));
         }
       },
       onStatus: (status) {
+        if (kDebugMode) debugPrint('speech onStatus: $status');
         if (status == 'done' && isRecording && _elapsedSeconds < _maxRecordingSeconds) {
           Future.delayed(const Duration(milliseconds: 300), () {
-            if (isRecording) {
-              _restartListening();
-            }
+            if (isRecording) _restartListening();
           });
         }
       },
     );
 
+    if (kDebugMode) debugPrint('initSpeech available: $available');
     if (!available) {
-      emit(RecordErrorState("Speech recognition not available"));
+      // Important: don't open settings from the cubit. Emit an error state UI can react to.
+      emit(RecordErrorState("Speech recognition not available on this device"));
     }
   }
 
   Future<void> _restartListening() async {
-    if (_speech == null || !isRecording) return;
-
-    String localeCode = languages[selectedLanguage] ?? "en-US";
-
-    _speech!.listen(
-      onResult: (result) {
-        if (result.recognizedWords.isNotEmpty) {
-          String newWords = result.recognizedWords;
-
-          if (currentRecognizedWords.isEmpty) {
-            currentRecognizedWords = newWords;
-          } else if (newWords.contains(currentRecognizedWords)) {
-            currentRecognizedWords = newWords;
-          } else if (!currentRecognizedWords.contains(newWords)) {
-            currentRecognizedWords += ' $newWords';
-          }
-        }
-
-        if (result.finalResult) {
-          hasFinalResult = true;
-        }
-
-        emit(RecordInProgressState(currentRecognizedWords));
-      },
-      onSoundLevelChange: (level) {
-        currentSoundLevel = level;
-        emit(SoundLevelChangedState(level));
-      },
-      listenFor: Duration(seconds: _maxRecordingSeconds - _elapsedSeconds),
-      pauseFor: const Duration(seconds: 10),
-      localeId: localeCode,
-      listenOptions: stt.SpeechListenOptions(
-        partialResults: true,
-        cancelOnError: false,
-        onDevice: false,
-        listenMode: stt.ListenMode.dictation,
-      ),
-    );
-  }
-
-  Future<void> startRecording() async {
-    if (_speech == null) await initSpeech();
-
-    finalRecordedText = null;
-    bool hasPermission = await Permission.microphone.request().isGranted;
-    if (!hasPermission) {
-      emit(RecordErrorState("Microphone permission denied"));
+    // Guard: must have a SpeechToText instance and be actively recording
+    if (_speech == null || !isRecording) {
+      if (kDebugMode) debugPrint('[_restartListening] ignored: _speech=${_speech != null}, isRecording=$isRecording');
       return;
     }
 
-    isRecording = true;
-    hasFinalResult = false;
-    currentRecognizedWords = '';
-    emit(RecordInProgressState(currentRecognizedWords));
+    // Prevent concurrent listen() calls
+    if (_isListening) {
+      if (kDebugMode) debugPrint('[_restartListening] already listening - skip');
+      return;
+    }
 
-    _startRecordingTimer();
-    await _restartListening();
+    // compute remaining time
+    final remainingSeconds = _maxRecordingSeconds - _elapsedSeconds;
+    if (remainingSeconds <= 0) {
+      if (kDebugMode) debugPrint('[_restartListening] no remaining time (elapsed=$_elapsedSeconds)');
+      return;
+    }
+
+    final localeCode = languages[selectedLanguage] ?? 'en-US';
+    if (kDebugMode) debugPrint('[_restartListening] starting listen (locale: $localeCode, remaining: $remainingSeconds)');
+
+    try {
+      _isListening = true;
+
+      _speech!.listen(
+        onResult: (result) {
+          if (kDebugMode) debugPrint('speech onResult: "${result.recognizedWords}" final=${result.finalResult}');
+
+          if (result.recognizedWords.isNotEmpty) {
+            final newWords = result.recognizedWords;
+
+            // merge logic: prefer the newest recognized content but avoid duplicates
+            if (currentRecognizedWords.isEmpty) {
+              currentRecognizedWords = newWords;
+            } else if (newWords.contains(currentRecognizedWords)) {
+              currentRecognizedWords = newWords;
+            } else if (!currentRecognizedWords.contains(newWords)) {
+              currentRecognizedWords = '$currentRecognizedWords $newWords';
+            }
+          }
+
+          if (result.finalResult) {
+            hasFinalResult = true;
+            if (kDebugMode) debugPrint('speech final result received');
+            // optionally stop automatically on final result (commented out)
+            // stopRecording();
+          }
+
+          // update UI
+          emit(RecordInProgressState(currentRecognizedWords));
+        },
+        onSoundLevelChange: (level) {
+          currentSoundLevel = level;
+          emit(SoundLevelChangedState(level));
+        },
+        listenFor: Duration(seconds: remainingSeconds),
+        pauseFor: const Duration(seconds: 10),
+        localeId: localeCode,
+        listenOptions: stt.SpeechListenOptions(
+          partialResults: true,
+          cancelOnError: false,
+          onDevice: false, // use cloud/system recognizer for maximum compatibility
+          listenMode: stt.ListenMode.dictation,
+        ),
+      );
+
+      // safety: ensure _isListening resets after expected listen period
+      Future.delayed(Duration(seconds: remainingSeconds + 1), () {
+        _isListening = false;
+      });
+
+      if (kDebugMode) debugPrint('[_restartListening] listen() called successfully');
+    } catch (e, st) {
+      if (kDebugMode) debugPrint('[_restartListening] listen() threw: $e\n$st');
+      emit(RecordErrorState('Failed to start listening: ${e.toString()}'));
+      _isListening = false;
+    }
+  }
+
+  Future<void> startRecording() async {
+    if (kDebugMode) debugPrint('startRecording: check/request microphone permission');
+
+    try {
+      if (await Permission.microphone.isPermanentlyDenied) {
+        // Don't open settings directly from cubit. Emit an error so UI can show a dialog.
+        emit(RecordErrorState("Microphone permission permanently denied. Please enable in app settings."));
+        return;
+      }
+
+      final status = await Permission.microphone.request();
+      if (kDebugMode) debugPrint('microphone permission status: $status');
+
+      if (!status.isGranted) {
+        emit(RecordErrorState("Microphone permission denied"));
+        return;
+      }
+
+      // now we have permission
+      if (_speech == null) await initSpeech();
+      if (_speech == null) {
+        emit(RecordErrorState("Speech recognizer not available"));
+        return;
+      }
+
+      isRecording = true;
+      hasFinalResult = false;
+      currentRecognizedWords = '';
+      emit(RecordInProgressState(currentRecognizedWords));
+
+      _startRecordingTimer();
+      await _restartListening();
+    } catch (e, st) {
+      if (kDebugMode) debugPrint('startRecording error: $e\n$st');
+      emit(RecordErrorState('Failed to start recording: ${e.toString()}'));
+    }
   }
 
   Future<void> stopRecording() async {
+    // be idempotent
     if (_speech == null || !isRecording) return;
 
-    await _speech!.stop();
+    if (kDebugMode) debugPrint('stopRecording: stopping...');
+    _isStopping = true;
+    try {
+      await _speech!.stop();
+    } catch (e, st) {
+      if (kDebugMode) debugPrint('stopRecording stop() error: $e\n$st');
+    }
+
     isRecording = false;
     _stopRecordingTimer();
+    _isListening = false;
+    _isStopping = false;
 
     currentSoundLevel = 0.0;
     emit(SoundLevelChangedState(0.0));
@@ -257,7 +404,7 @@ class HomeCubit extends Cubit<HomeStates> {
     try {
       dailyRecordings = await limitsService.incrementRecording(userId);
     } catch (e) {
-      debugPrint('Error incrementing recording count: $e');
+      if (kDebugMode) debugPrint('Error incrementing recording count: $e');
     }
 
     emit(RecordSuccessState(finalText));
@@ -276,20 +423,16 @@ class HomeCubit extends Cubit<HomeStates> {
     return text;
   }
 
-  // ==================== COMPLETE SESSION (INCREMENTS MONTHLY COUNTER!) ====================
+  // ==================== SESSION MANAGEMENT ====================
   Future<void> completeSession() async {
     try {
-      // Increment monthly session counter
       monthlyCompletedSessions = await limitsService.incrementSession(userId);
-
       emit(SessionCompletedState(monthlyCompletedSessions));
     } catch (e) {
-      debugPrint('Error incrementing monthly session count: $e');
+      if (kDebugMode) debugPrint('Error incrementing monthly session count: $e');
     }
   }
 
-  // ==================== RESET RECORDING STATE ====================
-  /// Call this when starting a new session to clear all recording data
   void resetRecordingState() {
     currentRecognizedWords = '';
     finalRecordedText = null;
@@ -297,12 +440,10 @@ class HomeCubit extends Cubit<HomeStates> {
     currentSoundLevel = 0.0;
     isRecording = false;
     _stopRecordingTimer();
-
-    // Emit state to update UI
     emit(RecordingStateResetState());
   }
 
-  // ==================== UI State Management ====================
+  // ==================== UI STATE MANAGEMENT ====================
   void toggleSection(String section) {
     expandedSection = expandedSection == section ? null : section;
     emit(SectionToggledState(expandedSection));
@@ -326,17 +467,36 @@ class HomeCubit extends Cubit<HomeStates> {
     if (stage == Stage.generate) {
       resetRecordingState();
     }
-
     currentStage = stage;
     emit(StageChangedState(stage));
   }
 
   @override
   Future<void> close() async {
-    _stopRecordingTimer();
-    if (isRecording) {
-      await _speech?.stop();
+    // tidy up resources safely
+    try {
+      _stopRecordingTimer();
+      if (isRecording) {
+        try {
+          await _speech?.stop();
+        } catch (e) {
+          if (kDebugMode) debugPrint('close() stop() error: $e');
+        }
+      }
+    } catch (_) {}
+
+    try {
+      await _connectivitySub?.cancel();
+    } catch (e) {
+      if (kDebugMode) debugPrint('close() connectivity cancel error: $e');
     }
+    _connectivitySub = null;
+
+    try {
+      _connectivityDebounce?.cancel();
+    } catch (_) {}
+    _connectivityDebounce = null;
+
     return super.close();
   }
 }

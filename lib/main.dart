@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,12 +22,8 @@ void main() async {
 
   await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
-  debugPrint("DOTENV loaded: ${dotenv.isInitialized}");
-  final key = dotenv.env['GEMINI_API_KEY'];
-  debugPrint("GEMINI_API_KEY (first 6): ${key == null ? 'NULL' : key.substring(0, min(6, key.length))}");
   final User? currentUser = FirebaseAuth.instance.currentUser;
   final bool isLoggedIn = currentUser != null;
-
 
   runApp(
     SoundsCoolApp(

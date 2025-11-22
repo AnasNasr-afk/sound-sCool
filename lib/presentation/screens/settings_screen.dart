@@ -88,7 +88,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             isDefaultAction: true,
             onPressed: () async {
               Navigator.pop(context);
-              final isGranted = await NotificationHelper.enableNotificationsFlow();
+              final isGranted =
+                  await NotificationHelper.enableNotificationsFlow();
 
               setState(() {
                 _notificationsEnabled = isGranted;
@@ -119,14 +120,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
-        title: Text('Enable Notifications?',
+        title: Text(
+          'Enable Notifications?',
 
-            style: TextStyles.font20BlackBold.copyWith(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-            )
+          style: TextStyles.font20BlackBold.copyWith(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        content:  Text(
+        content: Text(
           'Allow notifications to receive important updates and reminders.',
           style: TextStyles.font16LightBlackSemiBold.copyWith(
             fontSize: 14.sp,
@@ -143,8 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               });
             },
             child: Text(
-
-                'Deny',
+              'Deny',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
@@ -156,7 +157,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              final isGranted = await NotificationHelper.enableNotificationsFlow();
+              final isGranted =
+                  await NotificationHelper.enableNotificationsFlow();
 
               setState(() {
                 _notificationsEnabled = isGranted;
@@ -171,15 +173,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }
             },
-            child: Text('Allow',
+            child: Text(
+              'Allow',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
                 color: ColorManager.mainGreen,
                 fontWeight: FontWeight.w600,
-
+              ),
             ),
-          ),
           ),
         ],
       ),
@@ -262,11 +264,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 user?.email ?? "No email",
                                 style: TextStyles.font16LightBlackSemiBold
                                     .copyWith(
-                                  fontSize: 14.sp,
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.w400,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                      fontSize: 14.sp,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w400,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                               ),
                             ],
                           ),
@@ -284,8 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           child: Text(
                             "FREE",
-                            style: TextStyles.font16LightBlackSemiBold
-                                .copyWith(
+                            style: TextStyles.font16LightBlackSemiBold.copyWith(
                               fontSize: 12.sp,
                               color: ColorManager.mainGreen,
                               fontWeight: FontWeight.w600,
@@ -345,13 +346,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   onTap: () async {
                     const androidLink =
-                        'https://play.google.com/store/apps/details?id=com.example.sounds_cool';
-                    const iosLink =
-                        'https://apps.apple.com/app/id1234567890';
+                        'https://play.google.com/store/apps/details?id=com.anasnasr.soundscool';
+                    const iosLink = 'https://apps.apple.com/app/id1234567890';
 
                     final appLink = Platform.isAndroid ? androidLink : iosLink;
 
-                    final message = '''Check out *Sounds Cool*! 🎧  
+                    final message =
+                        '''Check out *Sounds Cool*! 🎧  
 An interactive app that helps you improve your reading and pronunciation skills.
 
 Download it here:
@@ -366,7 +367,7 @@ $appLink
                         title: 'Try the Sounds Cool App!',
                         subject: 'Sounds Cool - Improve your language skills',
                         sharePositionOrigin:
-                        box!.localToGlobal(Offset.zero) & box.size,
+                            box!.localToGlobal(Offset.zero) & box.size,
                       ),
                     );
                   },

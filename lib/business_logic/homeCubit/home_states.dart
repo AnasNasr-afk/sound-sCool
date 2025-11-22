@@ -91,3 +91,8 @@ class SessionCompletedErrorState extends HomeStates {
   SessionCompletedErrorState(this.error);
 }
 class RecordingStateResetState extends HomeStates {}
+
+class ConnectivityChangedState extends HomeStates {
+  final ConnectivityStatus status;
+  ConnectivityChangedState(this.status);
+}
